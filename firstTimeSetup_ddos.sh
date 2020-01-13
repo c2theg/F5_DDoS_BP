@@ -313,24 +313,24 @@ if [ -f "DDoS_DeviceLevel.conf" ]; then
 fi
 
 #--------------------------------------------------------------------------------------------
-if [ ! -f "DDoS_Generic.json" ]; then
+if [ ! -f "DDoS_Generic.conf" ]; then
 	if [ $isOnline == true ]; then
-		echo "Downloading DoS Profile -> DDoS_Generic.json from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/DDoS_Generic.json"
+		echo "Downloading DoS Profile -> DDoS_Generic.conf from remote source. "
+		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/DDoS_Generic.conf"
 	else
-		echo "Please transfer DDoS_Generic.json to the BigIP to provision the profile"
+		echo "Please transfer DDoS_Generic.conf to the BigIP to provision the profile"
 	fi
 else
-	echo "Loading local DoS Profile -> DDoS_Generic.json "
+	echo "Loading local DoS Profile -> DDoS_Generic.conf "
 fi
 
 if [ -f "DDoS_Generic.json" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file DDoS_Generic.json verify
+	tmsh load /sys config merge file DDoS_Generic.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (DDoS_Generic)...  "
-	tmsh load /sys config merge file DDoS_Generic.json
+	tmsh load /sys config merge file DDoS_Generic.conf
 fi
 
 #--------------------------------------------------------------
