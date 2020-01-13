@@ -1,0 +1,111 @@
+#!/bin/sh
+#
+#
+# Authors / Contributers: 
+#	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
+#	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
+#
+#
+#
+Version="1.0.15"
+Updated="1/13/19"
+TestedOn="BigIP 15.0 - 15.1"
+#
+# Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
+echo "
+                                                                
+			 _____ ___    _____ _     _____ _____   
+			|   __|  _|  | __  |_|___|     |  _  | 
+			|   __|_  |  | __ -| | . |-   -|   __| 
+			|__|  |___|  |_____|_|_  |_____|__|    
+			                     |___|                                            
+			                                                                      
+ _____ _         _      _____ _              _____     _              
+|   __|_|___ ___| |_   |_   _|_|_____ ___   |   __|___| |_ _ _ ___    
+|   __| |  _|_ -|  _|    | | | |     | -_|  |__   | -_|  _| | | . |   
+|__|  |_|_| |___|_|      |_| |_|_|_|_|___|  |_____|___|_| |___|  _|   
+                                                              |_|     
+
+Version: $Version 
+Updated: $Updated
+Tested On: $TestedOn
+
+"
+#----------------------------------------------------------------------------------------------------------------
+tmsh modify sys software update { auto-check enabled auto-phonehome enabled frequency weekly }
+echo "Setting up logout best practices "
+tmsh modify auth password-policy policy-enforcement disabled
+tmsh modify sys global-settings gui-setup disabled
+tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
+
+echo "Setting DNS Servers (Google, Cloudflare, OpenDNS - v4/v6) "
+tmsh modify sys dns name-servers add { 208.67.220.220 1.1.1.1 8.8.8.8 2620:119:35::35 2001:4860:4860::8888 }
+tmsh modify sys dns search add { xyzcorp.com }
+
+echo "Setting NTP Server (Google, Cloudflare, NIST) and Timezone UTC "
+tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 }
+tmsh modify sys ntp timezone UTC
+
+echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
+#tmsh create net vlan Internet_Dirty tag 1234 mtu 1400 interfaces replace-all-with { 1.1 }
+#tmsh create net self 10.1.1.5/32 vlan Internet_Dirty allow-service default
+#tmsh create net vlan internal tag 1235 mtu 1400 interfaces replace-all-with { 1.2 }
+#tmsh create net self 10.1.1.6/32 vlan internal allow-service default
+
+tmsh create net vlan "Internet_Dirty" tag 666 interfaces replace-all-with { 1.2 } mtu 1500 syn-flood-rate-limit 512 syncache-threshold 5000 hardware-syncookie enabled description "Dirty traffic from Internet or Peering connection" 
+tmsh create net vlan "Internal_Clean" tag 4094 interfaces replace-all-with { 1.1 } mtu 1500  description "Internal clean traffic"
+
+echo "Creating SelfIP's (10.1.1.10 - Internet_Dirty / 10.1.1.15 - Internal_Clean) "
+tmsh create net self 10.1.1.10/32 vlan "Internet_Dirty" allow-service default
+tmsh create net self 10.1.1.15/32 vlan "Internal_Clean" allow-service default
+
+echo "Configuring RFC 1918 space to have access to SNMP "
+tmsh modify sys snmp allowed-addresses add { 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }
+
+echo "Setting 'Message of the Day' (CLI & WebUI) with Security / Legal verbage "
+tmsh modify sys sshd banner enabled
+tmsh modify sys sshd banner-text "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED!  You must have explicit, authorized permission to access or configure this device. Unauthorized attempts and actions to access or use this system may result in civil and/or criminal penalties.  All activities performed on this device are logged and monitored."
+tmsh modify sys sshd inactivity-timeout 3600 # 1 hour
+
+tmsh modify sys global-settings gui-security-banner enabled
+tmsh modify sys global-settings gui-security-banner-text "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED!  You must have explicit, authorized permission to access or configure this device. Unauthorized attempts and actions to access or use this system may result in civil and/or criminal penalties.  All activities performed on this device are logged and monitored."
+tmsh modify sys global-settings console-inactivity-timeout 900 # 15 minutes
+
+echo "Modify Compatibility - Enabled PVA (Hardware)" # Sven Mueller -> 1/7/20
+tmsh modify sys compatibility-level level 2
+wait 
+
+echo "Creating common port-lists " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-port-list.html
+tmsh create net port-list "Ports_Webserver" ports add { 80 443 } description "HTTP & HTTPS ports"
+tmsh create net port-list "Ports_SIP" ports add { 5060 5061 10000-10100 } description "List of common ports used for SIP / VoIP"
+tmsh create net port-list "Ports_FTP" ports add { 20 21 } description "List of FTP Ports"
+sleep 2
+
+echo "Creating common address-lists (DNS Servers) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-address-list.html
+tmsh create net address-list "DNS_Google" addresses add { 8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888 } description "Google DNS"
+tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
+tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
+sleep 2
+
+#--- Logging ----
+echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
+tmsh create ltm node "Logging_node1" address 10.1.13.37 connection-limit 512 monitor gateway_icmp description "Logging node"
+
+echo "Creating Log Pool (Pool_Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-pool.html 
+tmsh create ltm pool "Pool_Log_Dest" monitor gateway_icmp members add { "Logging_node1":9200 } description "HSL logging pool for DDoS"
+
+echo "Creating Log Destination (Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
+tmsh create sys log-config destination remote-high-speed-log "Log_Dest" pool-name "Pool_Log_Dest" protocol tcp description "HSL Destination for Logs"
+
+echo "Creating Log Publisher (Log_Publisher) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
+tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Dest" } description "Logging Publisher"
+wait
+# log-shun enabled -> The log-shun option can only be enabled on the global-network log profile.
+# log-geo enabled  -> The log-geo option can only be enabled on the global-network log profile.
+# log-rtbh enabled -> The log-rtbh option can only be enabled on the global-network log profile.
+# log-scrubber enabled -> The log-scrubber option can only be enabled on the global-network log profile.
+
+
+
+echo "\r\n \r\n DONE! \r\n \r\n"
+echo "Please run another script to provide use-case specific examples. \r\n"
