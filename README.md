@@ -62,7 +62,8 @@ This script sets the following DDoS specific area's:
 ```
 
 
-<h2>ADC</h2>
+<B>ADC</B>
+
 Run the following script:
 ```
     firstTimeSetup_adc.sh
