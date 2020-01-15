@@ -60,3 +60,14 @@ This script sets the following DDoS specific area's:
 - IPS (Intrusion Pretection Service) DDoS profile
 - Example LTM Virtual Servers  (Security Focused)
 ```
+
+<b>ADC</b>
+Run the following script:
+```
+    firstTimeSetup_adc.sh
+```
+This script sets the following DDoS specific area's:
+```
+- TCP Profile - Optimized for Data Center traffic (BBR congestion-control configured)
+- HTTP Profile - Optimized for Mobile users
+```
