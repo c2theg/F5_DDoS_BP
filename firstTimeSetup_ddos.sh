@@ -3,7 +3,7 @@
 Version="1.0.17"
 Updated="1/15/19"
 TestedOn="BigIP 15.0 - 15.1"
-ConfigLocation="https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/"
+ConfigLocation="https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master"
 
 Authors = "
 Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
@@ -113,7 +113,7 @@ echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.c
 if [ ! -f "profiles_ipi_feeds.conf" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading IPI Profile -> profiles_ipi_feeds.conf from remote source. "
-		curl -k -O "$ConfigLocation" + "profiles_ipi_feeds.conf"
+		curl -k -O "$ConfigLocation/profiles_ipi_feeds.conf"
 	else
 		echo "Please transfer profiles_ipi_feeds.conf to the BigIP to provision the profile"
 	fi
@@ -167,7 +167,7 @@ echo "Creating Eviction Policy (DDoS_Eviction_Policy) " # https://clouddocs.f5.c
 if [ ! -f "profiles_eviction.conf" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading FastL4 Profile -> profiles_eviction.conf from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/profiles_eviction.conf"
+		curl -k -O "$ConfigLocation/profiles_eviction.conf"
 	else
 		echo "Please transfer profiles_eviction.conf to the BigIP to provision the profile"
 	fi
@@ -324,7 +324,7 @@ sleep 2
 if [ ! -f "profiles_fastl4.conf" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading FastL4 Profile -> profiles_fastl4.conf from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/profiles_fastl4.conf"
+		curl -k -O "$ConfigLocation/profiles_fastl4.conf"
 	else
 		echo "Please transfer profiles_fastl4.conf to the BigIP to provision the profile"
 	fi
@@ -346,7 +346,7 @@ fi
 if [ ! -f "DDoS_DeviceLevel.conf" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading DoS Profile -> DDoS_DeviceLevel.conf from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/DDoS_DeviceLevel.conf"
+		curl -k -O "$ConfigLocation/DDoS_DeviceLevel.conf"
 	else
 		echo "Please transfer DDoS_DeviceLevel.conf to the BigIP to provision the profile"
 	fi
@@ -367,7 +367,7 @@ fi
 if [ ! -f "DDoS_Generic.json" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading DoS Profile -> DDoS_Generic.json from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/DDoS_Generic.json"
+		curl -k -O "$ConfigLocation/DDoS_Generic.json"
 	else
 		echo "Please transfer DDoS_Generic.json to the BigIP to provision the profile"
 	fi
@@ -389,7 +389,7 @@ fi
 if [ ! -f "profiles_ddos_dns.conf" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading DNS DDoS Profile -> profiles_ddos_dns.conf from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/profiles_ddos_dns.conf"
+		curl -k -O "$ConfigLocation/profiles_ddos_dns.conf"
 	else
 		echo "Please transfer profiles_ddos_dns.conf to the BigIP to provision the profile"
 	fi
@@ -423,7 +423,7 @@ fi
 if [ ! -f "protocol_inspection_app_ddos_ips.json" ]; then
 	if [ $isOnline == true ]; then
 		echo "Downloading IPS (protocol_inspection_app_ddos_ips.json) config file...  "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/Vendor_code/master/F5/protocol_inspection_app_ddos_ips.json"
+		curl -k -O "$ConfigLocation/protocol_inspection_app_ddos_ips.json"
 	else
 		echo "Please transfer protocol_inspection_app_ddos_ips.json to your BigIP to provision the DDoS IPS profile."
 	fi
