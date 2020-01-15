@@ -14,7 +14,7 @@ To provide the generic foundation for the config, run:
 
 This script sets the following:
 ```
-- logout
+- Logout
 - DNS and NTP Servers
 - VLans
 - Self IP's
@@ -24,4 +24,16 @@ This script sets the following:
 - Port lists
 - Address Lists
 - Logging
+```
+
+<h2>Use-Case based Setup's</h2>
+
+<b>DDoS</b>
+This is for the following use-cases
+1) Inline
+2) Out of Path
+3) Span * (Work in progress)
+
+```
+    firstTimeSetup_ddos.sh
 ```
