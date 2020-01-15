@@ -1,14 +1,11 @@
 #!/bin/sh
 #
-#
-# Authors / Contributers: 
+# Authors / Contributers:
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-#
-#
-Version="1.0.15"
-Updated="1/13/19"
+Version="1.0.16"
+Updated="1/14/19"
 TestedOn="BigIP 15.0 - 15.1"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
@@ -43,6 +40,7 @@ tmsh modify sys dns name-servers add { 208.67.220.220 1.1.1.1 8.8.8.8 2620:119:3
 tmsh modify sys dns search add { xyzcorp.com }
 
 echo "Setting NTP Server (Google, Cloudflare, NIST) and Timezone UTC "
+# Dont Add: pool.ntp.org to the list, as Shodan has servers on it. 
 tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 }
 tmsh modify sys ntp timezone UTC
 
@@ -100,12 +98,11 @@ tmsh create sys log-config destination remote-high-speed-log "Log_Dest" pool-nam
 echo "Creating Log Publisher (Log_Publisher) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
 tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Dest" } description "Logging Publisher"
 wait
+
 # log-shun enabled -> The log-shun option can only be enabled on the global-network log profile.
 # log-geo enabled  -> The log-geo option can only be enabled on the global-network log profile.
 # log-rtbh enabled -> The log-rtbh option can only be enabled on the global-network log profile.
 # log-scrubber enabled -> The log-scrubber option can only be enabled on the global-network log profile.
-
-
 
 echo "\r\n \r\n DONE! \r\n \r\n"
 echo "Please run another script to provide use-case specific examples. \r\n"

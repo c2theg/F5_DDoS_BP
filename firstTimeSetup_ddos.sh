@@ -1,8 +1,10 @@
 #!/bin/sh
 #
-Version="1.0.15"
-Updated="1/13/19"
+Version="1.0.17"
+Updated="1/15/19"
 TestedOn="BigIP 15.0 - 15.1"
+ConfigLocation="https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/"
+
 Authors = "
 Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
 Sven Mueller         | Security Solution Architect - SP | AMEA | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
@@ -23,10 +25,26 @@ Version: $Version
 Updated: $Updated
 Tested On: $TestedOn
 Authors / Contributers: $Authors
-
+Config Location: $ConfigLocation
 
 "
 #----------------------------------------------------------------------------------------------------------------
+#---- Check if Online ----
+if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
+	echo "You are connected to the internet!!! "
+	isOnline=true
+else
+	echo " "
+	echo " "
+	echo "*********************************************"
+	echo "*** YOU ARE NOT CONNECTED TO THE INTERNET ***"
+	echo "*********************************************"
+	echo " "
+	echo " "
+	echo "Updating of IP-Inteligence rules, IPS signatures, GeoIP Databases, DDoS profiles, etc. will not work until you resolve this issue"
+	isOnline=false
+fi
+
 #88888888888888888888888888888888888888888
 #---------- SECURITY SETTINGS ------------
 #88888888888888888888888888888888888888888
@@ -47,7 +65,7 @@ wait
 echo "DoS Scrubtime value - 10ns"
 tmsh modify sys db dos.scrubtime value 10
 
-# disable RST cause log (var/log/ltm), should by by default
+# disable RST cause log (var/log/ltm), should be by default
 tmsh modify /sys db tm.rstcause.log value disable
 tmsh modify sys db tm.rstcause.pkt value disable
 
@@ -78,7 +96,9 @@ tmsh create security ip-intelligence blacklist-category "DDoS_Blacklisted" descr
 wait
 sleep 2
 echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-ip-intelligence-feed-list.html
+# >>> TMSH Location: show running-config security ip-intelligence 
 
+# Human Readable version below
 #create security ip-intelligence feed-list "DDoS_Feeds_test" description "IP addresses and URLs to allow and block DDoS sources" feeds add 
 #"blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" interval 432300 }}}
 #"blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt" interval 432000 }}}
@@ -89,8 +109,31 @@ echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.c
 #"tor_exit_nodes" { default-blacklist-category "	tor_proxy" default-list-type "blacklist" poll { url "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" interval 86600 }}
 #}
 
-# One liner
-tmsh create security ip-intelligence feed-list "DDoS_Feeds" description "IP addresses and URLs to allow and block DDoS sources" feeds add { "blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" interval 432300 }} "blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt" interval 432000 }} "blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }} "whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }} "whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }} "whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }} "tor_exit_nodes" { default-blacklist-category "tor_proxy" default-list-type "blacklist" poll { url "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" interval 86600 }}}
+#--- Load Profile(s) from remote source ---
+if [ ! -f "profiles_ipi_feeds.conf" ]; then
+	if [ $isOnline == true ]; then
+		echo "Downloading IPI Profile -> profiles_ipi_feeds.conf from remote source. "
+		curl -k -O "$ConfigLocation" + "profiles_ipi_feeds.conf"
+	else
+		echo "Please transfer profiles_ipi_feeds.conf to the BigIP to provision the profile"
+	fi
+else
+	echo "Loading Device DoS Profile -> profiles_ipi_feeds.conf "
+fi
+
+if [ -f "profiles_ipi_feeds.conf" ]; then
+	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_ipi_feeds.conf verify
+	wait
+	sleep 2
+	echo "Merging DoS Profile (profiles_ipi_feeds)...  "
+	tmsh load /sys config merge file profiles_ipi_feeds.conf
+else
+	echo "Falling back to older, embedded version"
+	tmsh create security ip-intelligence feed-list "DDoS_Feeds" description "IP addresses and URLs to allow and block DDoS sources" feeds add { "blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" interval 432300 }} "blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt" interval 432000 }} "blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }} "whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }} "whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }} "whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }} "tor_exit_nodes" { default-blacklist-category "tor_proxy" default-list-type "blacklist" poll { url "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" interval 86600 }}}
+fi
+#--------------------------------------------------------------
+
 
 #--- Traffic-Group ---
 #Doesnt do much currently. But will in the future. Need feedback from the field
@@ -98,7 +141,8 @@ echo "Creating Traffic-Group (DDoS_Traffic_Group) "  # https://clouddocs.f5.com/
 tmsh create cm traffic-group "DDoS_Traffic_Group"
 
 echo "Creating DDoS_IPI_Feeds policy... "
-#create security ip-intelligence policy "DDoS_IPI_Feeds_1" 
+# Human Readable version below
+#create security ip-intelligence policy "DDoS_IPI_Feeds" 
 #description "DDoS Related feeds"
 #blacklist-categories add {
 #	"DDoS_Blacklisted" { action drop log-blacklist-hit-only use-policy-setting log-blacklist-whitelist-hit yes }
@@ -118,7 +162,31 @@ tmsh modify security ip-intelligence global-policy ip-intelligence-policy "DDoS_
 
 #--- Eviction Policy ---
 echo "Creating Eviction Policy (DDoS_Eviction_Policy) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-eviction-policy.html
-tmsh create ltm eviction-policy "DDoS_Eviction_Policy" description "Policy to drop short lived connections before they DoS the BigIP" high-water 70 low-water 60 slow-flow { enabled true threshold-bps 32 grace-period 10 throttling enabled maximum 15 } strategies { bias-idle { enabled true }}
+
+#--- Load Profile(s) from remote source ---
+if [ ! -f "profiles_eviction.conf" ]; then
+	if [ $isOnline == true ]; then
+		echo "Downloading FastL4 Profile -> profiles_eviction.conf from remote source. "
+		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/profiles_eviction.conf"
+	else
+		echo "Please transfer profiles_eviction.conf to the BigIP to provision the profile"
+	fi
+else
+	echo "Loading Device DoS Profile -> profiles_eviction.conf "
+fi
+
+if [ -f "profiles_eviction.conf" ]; then
+	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_eviction.conf verify
+	wait
+	sleep 2
+	echo "Merging DoS Profile (profiles_eviction)...  "
+	tmsh load /sys config merge file profiles_eviction.conf
+else
+	echo "Falling back to older, embedded version"
+	tmsh create ltm eviction-policy "DDoS_Eviction_Policy" description "Policy to drop short lived connections before they DoS the BigIP" high-water 70 low-water 60 slow-flow { enabled true threshold-bps 32 grace-period 10 throttling enabled maximum 15 } strategies { bias-idle { enabled true } bias-oldest { enabled true }}
+fi
+#--------------------------------------------------------------
 
 echo "Setting Eviction Policy (DDoS_Eviction_Policy) as default " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-global-settings-connection.html
 tmsh modify ltm global-settings connection global-flow-eviction-policy "/Common/DDoS_Eviction_Policy"
@@ -249,23 +317,6 @@ tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "FW_Rule0" { r
 echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
 tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
 
-#---- Check if Online ----
-if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
-	echo "You are connected to the internet!!! "
-	isOnline=true
-else
-	echo " "
-	echo " "
-	echo "*********************************************"
-	echo "*** YOU ARE NOT CONNECTED TO THE INTERNET ***"
-	echo "*********************************************"
-	echo " "
-	echo " "
-	echo "Updating of IP-Inteligence rules, IPS signatures, GeoIP Databases, DDoS profiles, etc. will not work until you resolve this issue"
-	isOnline=false
-fi
-
-
 #--- Load DoS Profile(s) ---
 wait 
 sleep 2
@@ -313,24 +364,24 @@ if [ -f "DDoS_DeviceLevel.conf" ]; then
 fi
 
 #--------------------------------------------------------------------------------------------
-if [ ! -f "DDoS_Generic.conf" ]; then
+if [ ! -f "DDoS_Generic.json" ]; then
 	if [ $isOnline == true ]; then
-		echo "Downloading DoS Profile -> DDoS_Generic.conf from remote source. "
-		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/DDoS_Generic.conf"
+		echo "Downloading DoS Profile -> DDoS_Generic.json from remote source. "
+		curl -k -O "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/DDoS_Generic.json"
 	else
-		echo "Please transfer DDoS_Generic.conf to the BigIP to provision the profile"
+		echo "Please transfer DDoS_Generic.json to the BigIP to provision the profile"
 	fi
 else
-	echo "Loading local DoS Profile -> DDoS_Generic.conf "
+	echo "Loading local DoS Profile -> DDoS_Generic.json "
 fi
 
 if [ -f "DDoS_Generic.json" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file DDoS_Generic.conf verify
+	tmsh load /sys config merge file DDoS_Generic.json verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (DDoS_Generic)...  "
-	tmsh load /sys config merge file DDoS_Generic.conf
+	tmsh load /sys config merge file DDoS_Generic.json
 fi
 
 #--------------------------------------------------------------
