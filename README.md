@@ -62,7 +62,7 @@ This script sets the following DDoS specific area's:
 ```
 
 
-<B>ADC</B>
+<h2>ADC</h2>
 
 Run the following script:
 ```
