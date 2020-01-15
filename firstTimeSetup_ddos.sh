@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.19"
+Version="1.0.20"
 Updated="1/15/20"
 TestedOn="BigIP 15.0 - 15.1"
 
@@ -335,9 +335,9 @@ echo "Creating Virtual Server config...  "  # https://clouddocs.f5.com/cli/tmsh-
 wait
 sleep 2
 #create ltm virtual "CatchAll_IPv4_TCP" { destination 0.0.0.0:any profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } profiles add { "tcp-datacenter-optimized" { context { "clientside" } } } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" } 
-tmsh create ltm virtual "EXAMPLE_IPv4_DDoS_Customer" { destination 10.1.1.80:80 profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" "protocol_inspection_ddos"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DDoS Config" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_DDoS_Customer" { destination 10.1.1.80:80 profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" "IPS_Network_DDoS"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DDoS Config" } 
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_App" { destination 10.1.1.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2" "DDoS_Generic" "protocol_inspection_app_ddos_ips" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_App" { destination 10.1.1.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L3" "DDoS_Generic" "IPS_App_LNMP" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
 wait
 tmsh create ltm virtual "CatchAll_IPv4_DNS" { destination 0.0.0.0:53  ip-protocol udp profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all DNS Only v4 traffic" } 
 wait
