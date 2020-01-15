@@ -76,19 +76,23 @@ This script sets the following DDoS specific area's:
 ```
 
 
+<hr />
+
 <h2>Fresh Start</h2>
 
 Run the following script:
 ```
     firstTimeSetup_reset.sh
 ```
-Will reset the BigIP to the default config and reboot it. This <u>WILL NOT unlicense it!</u>
+Will reset the BigIP to the default config and reboot it. This <b><u>WILL NOT unlicense it!</u></b> But you will have to re-provision the BigIP afterwards.
 
 
-<h2>Provision</h2>
+<h2>Provisioning</h2>
 
 Run the following script:
 ```
-    firstTimeSetup_provision.sh
+    firstTimeSetup_provision_DDoS.sh
 ```
 This will provision the BigIP for a DDoS usecase. The script also provides examples on how it can be modified to change that usecase. <i>Others might be included in the future. </i>
+
+
