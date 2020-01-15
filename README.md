@@ -37,3 +37,26 @@ This is for the following use-cases
 ```
     firstTimeSetup_ddos.sh
 ```
+This script sets the following DDoS specific area's:
+```
+- Log Publisher (Security Settings)
+- Sets various db variables
+- Address and Port Lists
+- IP-Intelligence (Black & White list categories)
+- IP-Intelligence Address Feeds (External Feed lists)
+- Traffic Groups
+- Eviction Policies
+- TCP, UDP, IPOther - Policies
+- Timer Policy
+- Port Misuse Policy
+- Service Policy
+- Firewall - Rule Lists
+- Firewall - DDoS Policy
+- Sets Global Firewall Policy
+- Fast Layer 4 (fast_l4) Profile
+- DDoS (Device Level) profile
+- DDoS (Generic)
+- DDoS DNS profile
+- IPS (Intrusion Pretection Service) DDoS profile
+- Example LTM Virtual Servers  (Security Focused)
+```
