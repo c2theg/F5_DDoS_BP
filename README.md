@@ -76,8 +76,6 @@ This script sets the following DDoS specific area's:
 ```
 
 
-<hr />
-
 <h2>Fresh Start</h2>
 Run the following script:
 ```
