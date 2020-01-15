@@ -1,4 +1,4 @@
-<h2>Quick Setup</h2>
+<h1>Quick Setup</h1>
 
 - Use the One-line method, (using "download_git_repo.sh")
 ```
@@ -26,9 +26,9 @@ This script sets the following:
 - Logging
 ```
 
-<h2>Use-Case based Setup's</h2>
+<h1>Usecase based Setup's</h1>
 
-<b>DDoS</b>
+<h2>DDoS</h2>
 This is for the following use-cases
 1) Inline
 2) Out of Path
@@ -61,7 +61,7 @@ This script sets the following DDoS specific area's:
 - Example LTM Virtual Servers  (Security Focused)
 ```
 
-<b>ADC</b>
+<h2>ADC</h2>
 Run the following script:
 ```
     firstTimeSetup_adc.sh
