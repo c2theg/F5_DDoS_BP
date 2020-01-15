@@ -76,7 +76,7 @@ This script sets the following DDoS specific area's:
 ```
 
 
-<h2>Fresh Start</h2>
+Fresh Start
 Run the following script:
 ```
     firstTimeSetup_reset.sh
