@@ -14,5 +14,14 @@ To provide the generic foundation for the config, run:
 
 This script sets the following:
 ```
--1. logout
--2. DNS and NTP Servers
+- logout
+- DNS and NTP Servers
+- VLans
+- Self IP's
+- SNMP (basic)
+- Message of the Day (Legal verbage) - for both WebUI and CLI
+- PVA Compatibility
+- Port lists
+- Address Lists
+- Logging
+```
