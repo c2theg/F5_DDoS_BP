@@ -1,9 +1,7 @@
 #!/bin/sh
-#
-Version="1.0.17"
-Updated="1/15/19"
+Version="1.0.19"
+Updated="1/15/20"
 TestedOn="BigIP 15.0 - 15.1"
-ConfigLocation="https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master"
 
 Authors = "
 Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
@@ -25,30 +23,12 @@ Version: $Version
 Updated: $Updated
 Tested On: $TestedOn
 Authors / Contributers: $Authors
-Config Location: $ConfigLocation
 
 "
 #----------------------------------------------------------------------------------------------------------------
-#---- Check if Online ----
-if ping -q -c 1 -W 1 8.8.8.8 >/dev/null; then
-	echo "You are connected to the internet!!! "
-	isOnline=true
-else
-	echo " "
-	echo " "
-	echo "*********************************************"
-	echo "*** YOU ARE NOT CONNECTED TO THE INTERNET ***"
-	echo "*********************************************"
-	echo " "
-	echo " "
-	echo "Updating of IP-Inteligence rules, IPS signatures, GeoIP Databases, DDoS profiles, etc. will not work until you resolve this issue"
-	isOnline=false
-fi
-
 #88888888888888888888888888888888888888888
 #---------- SECURITY SETTINGS ------------
 #88888888888888888888888888888888888888888
-
 #--- Logging ---
 echo "Setting Firewall log-publisher to: Log_Publisher  "
 tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
@@ -110,17 +90,6 @@ echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.c
 #}
 
 #--- Load Profile(s) from remote source ---
-if [ ! -f "profiles_ipi_feeds.conf" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading IPI Profile -> profiles_ipi_feeds.conf from remote source. "
-		curl -k -O "$ConfigLocation/profiles_ipi_feeds.conf"
-	else
-		echo "Please transfer profiles_ipi_feeds.conf to the BigIP to provision the profile"
-	fi
-else
-	echo "Loading Device DoS Profile -> profiles_ipi_feeds.conf "
-fi
-
 if [ -f "profiles_ipi_feeds.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_ipi_feeds.conf verify
@@ -132,9 +101,6 @@ else
 	echo "Falling back to older, embedded version"
 	tmsh create security ip-intelligence feed-list "DDoS_Feeds" description "IP addresses and URLs to allow and block DDoS sources" feeds add { "blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" interval 432300 }} "blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt" interval 432000 }} "blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }} "whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }} "whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }} "whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }} "tor_exit_nodes" { default-blacklist-category "tor_proxy" default-list-type "blacklist" poll { url "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" interval 86600 }}}
 fi
-#--------------------------------------------------------------
-
-
 #--- Traffic-Group ---
 #Doesnt do much currently. But will in the future. Need feedback from the field
 echo "Creating Traffic-Group (DDoS_Traffic_Group) "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/cm/cm-traffic-group.html
@@ -164,17 +130,6 @@ tmsh modify security ip-intelligence global-policy ip-intelligence-policy "DDoS_
 echo "Creating Eviction Policy (DDoS_Eviction_Policy) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-eviction-policy.html
 
 #--- Load Profile(s) from remote source ---
-if [ ! -f "profiles_eviction.conf" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading FastL4 Profile -> profiles_eviction.conf from remote source. "
-		curl -k -O "$ConfigLocation/profiles_eviction.conf"
-	else
-		echo "Please transfer profiles_eviction.conf to the BigIP to provision the profile"
-	fi
-else
-	echo "Loading Device DoS Profile -> profiles_eviction.conf "
-fi
-
 if [ -f "profiles_eviction.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_eviction.conf verify
@@ -321,19 +276,8 @@ tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
 wait 
 sleep 2
 
-if [ ! -f "profiles_fastl4.conf" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading FastL4 Profile -> profiles_fastl4.conf from remote source. "
-		curl -k -O "$ConfigLocation/profiles_fastl4.conf"
-	else
-		echo "Please transfer profiles_fastl4.conf to the BigIP to provision the profile"
-	fi
-else
-	echo "Loading Device DoS Profile -> profiles_fastl4.conf "
-fi
-
 if [ -f "profiles_fastl4.conf" ]; then
-	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+	echo "Config Merge verify (profiles_fastl4) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_fastl4.conf verify
 	wait
 	sleep 2
@@ -341,64 +285,26 @@ if [ -f "profiles_fastl4.conf" ]; then
 	tmsh load /sys config merge file profiles_fastl4.conf
 fi
 #--------------------------------------------------------------
-
-
-if [ ! -f "DDoS_DeviceLevel.conf" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading DoS Profile -> DDoS_DeviceLevel.conf from remote source. "
-		curl -k -O "$ConfigLocation/DDoS_DeviceLevel.conf"
-	else
-		echo "Please transfer DDoS_DeviceLevel.conf to the BigIP to provision the profile"
-	fi
-else
-	echo "Loading Device DoS Profile -> DDoS_DeviceLevel.conf "
-fi
-
-if [ -f "DDoS_DeviceLevel.conf" ]; then
-	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file DDoS_DeviceLevel.conf verify
+if [ -f "profiles_ddos_device.conf" ]; then
+	echo "Config Merge verify (profiles_ddos_device) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_ddos_device.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (DDoS_DeviceLevel)...  "
-	tmsh load /sys config merge file DDoS_DeviceLevel.conf
+	tmsh load /sys config merge file profiles_ddos_device.conf
 fi
-
 #--------------------------------------------------------------------------------------------
-if [ ! -f "DDoS_Generic.json" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading DoS Profile -> DDoS_Generic.json from remote source. "
-		curl -k -O "$ConfigLocation/DDoS_Generic.json"
-	else
-		echo "Please transfer DDoS_Generic.json to the BigIP to provision the profile"
-	fi
-else
-	echo "Loading local DoS Profile -> DDoS_Generic.json "
-fi
-
-if [ -f "DDoS_Generic.json" ]; then
-	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file DDoS_Generic.json verify
+if [ -f "profiles_ddos_generic.conf" ]; then
+	echo "Config Merge verify (profiles_ddos_generic) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_ddos_generic.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (DDoS_Generic)...  "
-	tmsh load /sys config merge file DDoS_Generic.json
+	tmsh load /sys config merge file profiles_ddos_generic.conf
 fi
-
 #--------------------------------------------------------------
-
-if [ ! -f "profiles_ddos_dns.conf" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading DNS DDoS Profile -> profiles_ddos_dns.conf from remote source. "
-		curl -k -O "$ConfigLocation/profiles_ddos_dns.conf"
-	else
-		echo "Please transfer profiles_ddos_dns.conf to the BigIP to provision the profile"
-	fi
-else
-	echo "Loading Device DNS DDoS Profile -> profiles_ddos_dns.conf "
-fi
-
 if [ -f "profiles_ddos_dns.conf" ]; then
-	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+	echo "Config Merge verify (profiles_ddos_dns) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_ddos_dns.conf verify
 	wait
 	sleep 2
@@ -406,11 +312,9 @@ if [ -f "profiles_ddos_dns.conf" ]; then
 	tmsh load /sys config merge file profiles_ddos_dns.conf
 fi
 
-
 #88888888888888888888888888888888888888888888888888888
 #--- IPS files: protocol_inspection_app_ddos_ips ---
 #88888888888888888888888888888888888888888888888888888
-
 if [ -f "pi_updates.im" ]; then
 	#tmsh modify security protocol-inspection common-config auto-update enabled auto-update-interval weekly
 	tmsh install security protocol-inspection updates file 'pi_updates.im' # pi_updates_15.1.0-20191227.0146.im
@@ -418,22 +322,12 @@ if [ -f "pi_updates.im" ]; then
 else
 	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
 fi
-
 #--- IPS config ---
-if [ ! -f "protocol_inspection_app_ddos_ips.json" ]; then
-	if [ $isOnline == true ]; then
-		echo "Downloading IPS (protocol_inspection_app_ddos_ips.json) config file...  "
-		curl -k -O "$ConfigLocation/protocol_inspection_app_ddos_ips.json"
-	else
-		echo "Please transfer protocol_inspection_app_ddos_ips.json to your BigIP to provision the DDoS IPS profile."
-	fi
-fi
-
-if [ -f "protocol_inspection_app_ddos_ips.json" ]; then
-	echo "Loading IPS (protocol_inspection_app_ddos_ips.json) config file...  "
-	tmsh load /sys config merge file protocol_inspection_app_ddos_ips.json verify
+if [ -f "protocol_inspection_ddos.conf" ]; then
+	echo "Loading IPS (protocol_inspection_ddos.conf) config file...  "
+	tmsh load /sys config merge file protocol_inspection_ddos.conf verify
 	echo "Merging config... "
-	tmsh load /sys config merge file protocol_inspection_app_ddos_ips.json
+	tmsh load /sys config merge file protocol_inspection_ddos.conf
 fi
 
 #---- Virtal Server Pool ---
@@ -441,9 +335,9 @@ echo "Creating Virtual Server config...  "  # https://clouddocs.f5.com/cli/tmsh-
 wait
 sleep 2
 #create ltm virtual "CatchAll_IPv4_TCP" { destination 0.0.0.0:any profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } profiles add { "tcp-datacenter-optimized" { context { "clientside" } } } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" } 
-tmsh create ltm virtual "EXAMPLE_IPv4_DDoS_Customer" { destination 10.1.1.80:80 profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DDoS Config" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_DDoS_Customer" { destination 10.1.1.80:80 profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" "protocol_inspection_ddos"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DDoS Config" } 
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_App" { destination 10.1.1.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App - Reverse Proxy" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_App" { destination 10.1.1.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2" "DDoS_Generic" "protocol_inspection_app_ddos_ips" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
 wait
 tmsh create ltm virtual "CatchAll_IPv4_DNS" { destination 0.0.0.0:53  ip-protocol udp profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all DNS Only v4 traffic" } 
 wait
