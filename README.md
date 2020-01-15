@@ -91,19 +91,16 @@ Will reset the BigIP to the default config and reboot it. This <b><u>WILL NOT un
 
 <b>DDoS</b>
 
-Run the following script:
+This will provision the BigIP for a DDoS usecase. Run the following script:
 ```
     ./firstTimeSetup_provision_DDoS.sh
 ```
-This will provision the BigIP for a DDoS usecase.
 
 <b>ASM (Web Application Firewall)</b>
 
-Run the following script:
+This will provision the BigIP for a Web Application Firewall usecase.  Run the following script:
 ```
     ./firstTimeSetup_provision_ASM.sh
 ```
-This will provision the BigIP for a Web Application Firewall usecase. 
-
 
 These scripts also provide examples on how it can be modified to change the usecase. <i>Others might be included in the future. </i>
