@@ -9,7 +9,7 @@ From the output, you will be given the dir list of all files. These files provid
 
 To provide the generic foundation for the config, run:
 ```
-    firstTimeSetup.sh
+    ./firstTimeSetup.sh
 ```
 
 This script sets the following:
@@ -35,7 +35,7 @@ This is for the following use-cases
 3) Span * (Work in progress)
 
 ```
-    firstTimeSetup_ddos.sh
+    ./firstTimeSetup_ddos.sh
 ```
 This script sets the following DDoS specific area's:
 ```
@@ -66,7 +66,7 @@ This script sets the following DDoS specific area's:
 
 Run the following script:
 ```
-    firstTimeSetup_adc.sh
+    ./firstTimeSetup_adc.sh
 ```
 
 This script sets the following DDoS specific area's:
@@ -82,17 +82,27 @@ This script sets the following DDoS specific area's:
 
 Run the following script:
 ```
-    firstTimeSetup_reset.sh
+    ./firstTimeSetup_reset.sh
 ```
 Will reset the BigIP to the default config and reboot it. This <b><u>WILL NOT unlicense it!</u></b> But you will have to re-provision the BigIP afterwards.
 
 
 <h2>Provisioning</h2>
 
+<b>DDoS</b>
+
 Run the following script:
 ```
-    firstTimeSetup_provision_DDoS.sh
+    ./firstTimeSetup_provision_DDoS.sh
 ```
-This will provision the BigIP for a DDoS usecase. The script also provides examples on how it can be modified to change that usecase. <i>Others might be included in the future. </i>
+This will provision the BigIP for a DDoS usecase.
+
+<b>ASM (Web Application Firewall)</b>
+Run the following script:
+```
+    ./firstTimeSetup_provision_ASM.sh
+```
+This will provision the BigIP for a Web Application Firewall usecase. 
 
 
+These scripts also provide examples on how it can be modified to change the usecase. <i>Others might be included in the future. </i>
