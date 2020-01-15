@@ -26,7 +26,7 @@ This script sets the following:
 - Logging
 ```
 
-<h1>Usecase based Setup's</h1>
+<h1>Use case based Setup's</h1>
 
 <h2>DDoS</h2>
 This is for the following use-cases
