@@ -4,8 +4,8 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.16"
-Updated="1/14/19"
+Version="1.0.17"
+Updated="1/16/19"
 TestedOn="BigIP 15.0 - 15.1"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
@@ -90,7 +90,7 @@ echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-re
 tmsh create ltm node "Logging_node1" address 10.1.13.37 connection-limit 512 monitor gateway_icmp description "Logging node"
 
 echo "Creating Log Pool (Pool_Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-pool.html 
-tmsh create ltm pool "Pool_Log_Dest" monitor gateway_icmp members add { "Logging_node1":9200 } description "HSL logging pool for DDoS"
+tmsh create ltm pool "Pool_Log_Dest" monitor gateway_icmp members add { "Logging_node1":443 } description "HSL logging pool for DDoS"
 
 echo "Creating Log Destination (Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
 tmsh create sys log-config destination remote-high-speed-log "Log_Dest" pool-name "Pool_Log_Dest" protocol tcp description "HSL Destination for Logs"
