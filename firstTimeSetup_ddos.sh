@@ -178,9 +178,6 @@ tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDo
 #--- Protocol Security ----
 
 #--- Firwall Rules ---
-echo "Creating Firewall DDoS rule-lists (DDoS_RuleLists_Drop's and DDoS_RuleLists_Accept) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-rule-list.html
-wait
-sleep 2
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
 
 if [ -f "profiles_fw_ddos.conf" ]; then
