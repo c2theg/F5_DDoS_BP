@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.20"
-Updated="1/15/20"
+Version="1.0.21"
+Updated="1/16/20"
 TestedOn="BigIP 15.0 - 15.1"
 
 Authors = "
@@ -175,102 +175,22 @@ tmsh create security firewall port-misuse-policy "DDoS_PortMisuse" drop-on-l7-mi
 echo "Creating Service Policy (DDoS_ServicePolicy_Main) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-service-policy.html
 tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDoS_PortMisuse" timer-policy "DDoS_TimerPolicy"
 
-#--- Firwall - rules-list ---
+#--- Protocol Security ----
+
+#--- Firwall Rules ---
 echo "Creating Firewall DDoS rule-lists (DDoS_RuleLists_Drop's and DDoS_RuleLists_Accept) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-rule-list.html
-
-#  address-lists  Specifies a list of address lists (see security firewall address-list) against which the packet will be compared.
-#  addresses      Specifies a list of addresses, networks and address ranges against which the packet will be compared.
-#  fqdns          Specifies a list of Fully Qualified Domain Names that the packet will be compared against.
-#  geo            Specifies a list of Geo Locations that the packet will be compared against.
-#  ipi-category   Specifies a list of IP-Intelligence category names that the packet will be compared against.
-#  port-lists     Specifies a list of port lists (see security firewall port-list) against which the packet will be compared.
-#  ports          Specifies a list of ports and port ranges against which the packet will be compared.
-#  vlans          Specifies a list of vlans, vlan groups and tunnels against which the packet will be compared.
-#  zones          Specifies a list of Zones against which the packet origin will be compared.
-
-# One Liner
-#create security firewall rule-list "DDoS_RuleLists_1" description "Advance rule-lists which are more complex then basic firewall rules" rules add {  "IPI_Accept" { place-before first action accept-decisively source { ipi-category replace-all-with { "DDoS_Whitelisted" }  } } "Bogons" { place-after last action drop source { address-lists replace-all-with { "Bogons" } } description "list of bogon addresses" log yes } }
-
-#create security firewall rule-list "DDoS_RuleLists_Accept" description "Dynamically updated advance firewall policies.  *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** " rules add { 
-#"IPI_Accept" { place-before first action accept-decisively source { ipi-category replace-all-with { "DDoS_Whitelisted" }  } log yes }
-#}
-
-tmsh create security firewall rule-list "DDoS_RuleLists_Accept" description "Dynamically updated advance firewall policies.  *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** " rules add { "IPI_Accept" { place-before first action accept-decisively source { ipi-category replace-all-with { "DDoS_Whitelisted" }  } log yes } }
-wait
-#create security firewall rule-list "DDoS_RuleLists_Drop" description "Block traffic that shouldn't be on the internet" rules add { 
-#"Bogons" { place-before first action drop source { address-lists replace-all-with { "Bogons" } } description "list of bogon addresses (v4 & v6)" log yes }
-#"ICMP_Blocking" { place-after last action drop source {} ip-protocol icmp }
-#}
-tmsh create security firewall rule-list "DDoS_RuleLists_Drop" description "Drop ICMP and Bogons" rules add { "Bogons" { place-before first action drop source { address-lists replace-all-with { "DDoS_Bogons" } } description "list of bogon addresses (v4 & v6)" log yes } "ICMP_Blocking" { place-after last action drop source {} ip-protocol icmp } }
-wait
-#create security firewall rule-list "DDoS_RuleLists_2" description "Advance rule-lists which are more complex then basic firewall rules" rules add { 
-#
-#"IPI_Block" { place-after last action drop source { ipi-category replace-all-with { "DDoS_Attack_IPs" "DDoS_Blacklisted" "DDoS_Bogons" "tor_proxy" }  } log yes } }
-
-# One Liner
-tmsh create security firewall rule-list "DDoS_RuleLists_Drop_2" description "Dynamically updated advance firewall policies." rules add { "IPI_Block" { place-after last action drop source { ipi-category replace-all-with { "DDoS_Attack_IPs" "DDoS_Blacklisted" "DDoS_Bogons" "tor_proxy" "denial_of_service" "web_attacks" "botnets" "mobile_threats" "proxy" "phishing" "scanners" "infected_sources" "windows_exploits"}  } log yes  description "A number of IPI feed lists"} } }
-wait
-tmsh create security firewall rule-list "DDoS_RuleLists_Drop_Geo" description "Geolocation blocks. *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** " rules add { "Geo_Block" { place-after last action drop source { geo replace-all-with { KP IR } } log yes } }
-
-#--- Firwall Rule ---
 wait
 sleep 2
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
 
-#create security firewall policy "DDoS_FW_Parent_3" rules add { "DDoS_RuleLists_Accept" { place-before first action accept } "DDoS_RuleLists_Drop_Geo" { place-after second action drop } "DDoS_RuleLists_Drop" { place-after third action drop }  "DDoS_RuleLists_Drop_2" { place-after last action drop} }
-#reate security firewall policy "DDoS_FW_Parent_3" rules add { 
-#	"DDoS_RuleLists_Accept" { place-before first action accept } 
-#	"DDoS_RuleLists_Drop_Geo" { place-after first action drop } 	
-#	"DDoS_RuleLists_Drop" { place-after first action drop } 
-#	"DDoS_RuleLists_Drop_2" { place-after last action drop}
-#}
-
-#---ISSUE: Cant put all rules in as single entry. have to be broken out into each rule at a time. (REVERSE ORDER to get the priority you want)
-#--- drop ---
-tmsh create security firewall policy "DDoS_FW_Parent"
-#--- Single Rules ---
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "vision_server" { action drop destination { ports add { 6672 } } place-after first description "http://www.adminsub.net/tcp-udp-port-finder/6672" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Steam_Protocol" { action drop destination { ports add {  27015 } } place-after first description "Steam protocol attack" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Quake" { action drop destination { ports add { 666 26000 27960 28915 } } place-after first description "https://www.us-cert.gov/ncas/alerts/TA14-017A" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Xbox-Live" { action drop destination { ports add { 88 500 3074 3544 4500 } } place-after first description "https://support.xbox.com/en-US/xbox-one/networking/network-ports-used-xbox-live" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Kad" { action drop destination { ports add { 751 } } place-after first description "Kad P2P - PDF http://www.icact.org/upload/2012/0156/20120156_finalpaper.pdf" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "QuickTime_Streaming" { action drop destination { ports add { 9307 } } place-after first description "Quicktime steaming attack" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Portmap" { action drop destination { ports add { 111 } } place-after first description "RPC bind reflection DDoS attack" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "QOTD" { action drop destination { ports add { 17 } } place-after first description "Quote of the Day  https://en.wikipedia.org/wiki/QOTD" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "RIPv1" { action drop destination { ports add { 520 } } place-after first description "https://en.wikipedia.org/wiki/Routing_Information_Protocol" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "TFTP" { action drop destination { ports add { 69 } } place-after first description "https://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "SNMPv2" { action drop destination { ports add { 161 162  } } place-after first description "Simple Network Management Protocol  https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "NetBIOS" { action drop destination { ports add { 137 138 } } place-after first description "https://en.wikipedia.org/wiki/NetBIOS_over_TCP/IP" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "MS-SQL" { action drop destination { ports add { 1434 } } place-after first description "https://blogs.akamai.com/2015/02/plxsert-warns-of-ms-sql-reflection-attacks.html" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "RPC-Bind" { action drop destination { ports add { 111 } } place-after first description "https://www.securityweek.com/rpc-portmapper-abused-ddos-attack-reflection-amplification" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "WS-Discovery" { action drop destination { ports add { 139 445 1124 3702 } } place-after first description "https://www.zdnet.com/article/protocol-used-by-630000-devices-can-be-abused-for-devastating-ddos-attacks/" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Apple_Remote_Desktop" { action drop destination { ports add { 3283 } } place-after first description "https://en.wikipedia.org/wiki/Apple_Remote_Desktop" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "STUN" { action drop destination { ports add { 3478 3479 } } place-after first description "https://en.wikipedia.org/wiki/STUN  Also used for PSN - https://manuals.playstation.net/document/en/psvita/psn/firewall.html" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "CLDAP" { action drop destination { ports add { 389 } } place-after first description "https://www.f5.com/labs/articles/threat-intelligence/old-protocols-new-exploits-ldap-unwittingly-serves-ddos-amplification-attacks-22609" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "SSDP" { action drop destination { ports add { 1900 } } place-after first description "Simple Service Discovery Protocol  https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Memcached_TCP" { action drop destination { ports add { 11211 } } place-after first description "TCP version - https://en.wikipedia.org/wiki/Memcached" ip-protocol tcp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Memcached" { action drop destination { ports add { 11211 } } place-after first description "https://en.wikipedia.org/wiki/Memcached" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "Chargen" { action drop destination { ports add { 19 } } place-after first description "Character Generator Protocol  https://en.wikipedia.org/wiki/Character_Generator_Protocol" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "NTP" { action drop destination { ports add { 123 } } place-after first description "https://en.wikipedia.org/wiki/NTP_server_misuse_and_abuse" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "DNS" { action drop destination { ports add { 53 5353 853 } } place-after first description "DNS blocks - https://en.wikipedia.org/wiki/DNS_spoofing" ip-protocol udp log yes service-policy "DDoS_ServicePolicy_Main"} }
-
-wait
-sleep 2
-echo "Applying rule-lists to firewall rule... "
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "FW_Rule3" { rule-list "DDoS_RuleLists_Drop_Geo" place-after first description "Geolocation blocks. *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** " uuid auto-generate} } 
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "FW_Rule2" { rule-list "DDoS_RuleLists_Drop_2"   place-after first description "Dynamically updated advance firewall policies."} } }
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "FW_Rule1" { rule-list "DDoS_RuleLists_Drop"     place-after first description "Drop ICMP and Bogons"} } }
-
-#--- FW accept ---
-wait
-sleep 2
-echo "Adding ACCEPT rule-list to firewall rule... "
-tmsh modify security firewall policy "DDoS_FW_Parent" rules add { "FW_Rule0" { rule-list "DDoS_RuleLists_Accept" place-before first description "Dynamically updated advance firewall policies.  *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** "} } }
-
-echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
-tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
+if [ -f "profiles_fw_ddos.conf" ]; then
+	echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_fw_ddos.conf verify
+	wait
+	sleep 2
+	echo "Merging DoS Profile (profiles_fw_ddos)...  "
+	tmsh load /sys config merge file profiles_fw_ddos.conf
+fi
 
 #--- Load DoS Profile(s) ---
 wait 
