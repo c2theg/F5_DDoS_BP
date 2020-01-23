@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.22"
+Version="1.0.23"
 Updated="1/23/20"
 TestedOn="BigIP 15.0 - 15.1"
 
@@ -164,7 +164,10 @@ tmsh create security firewall port-misuse-policy "DDoS_PortMisuse" drop-on-l7-mi
 echo "Creating Service Policy (DDoS_ServicePolicy_Main) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-service-policy.html
 tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDoS_PortMisuse" timer-policy "DDoS_TimerPolicy"
 
-#--- Protocol Security ----
+#--- Tunnel GRE ---
+# https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net_tunnels_gre.html
+# ERROR: Can not create tunnel with all needed options via TMSH. Have to do merge config
+# Added example tunnel config to "profiles_ddos_generic.conf" file
 
 #--- Firwall Rules ---
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
