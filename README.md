@@ -40,6 +40,7 @@ This is for the following use-cases
 This script sets the following DDoS specific area's:
 ```
 - Log Publisher (Security Settings)
+- GRE Tunnel (Anycast)
 - Sets various db variables
 - Address and Port Lists
 - IP-Intelligence (Black & White list categories)
