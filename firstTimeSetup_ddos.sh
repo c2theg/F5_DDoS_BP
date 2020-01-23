@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.21"
-Updated="1/16/20"
+Version="1.0.22"
+Updated="1/23/20"
 TestedOn="BigIP 15.0 - 15.1"
 
 Authors = "
@@ -61,7 +61,9 @@ tmsh modify sys db afm.allowtmcvirtuals value true
 #--- DDoS ---
 echo "Creating DDoS Specific Address and Port lists.. "
 tmsh create net address-list "DDoS_Whitelist" addresses add { 8.8.8.8 208.67.222.222 1.1.1.1 } description "A list of ligitimate IP addresses  *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** You should add your mgmt subnets"
-tmsh create net address-list "DDoS_Bogons" addresses add { 0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.2.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3 fc00::/7 fd00::/8 fe80::/10 ::/128 ::1/128 ::ffff:0:0/96 ::/96 2001::/40 2001:0:a00::/40 2001:0:7f00::/40 2001:0:a9fe::/48 2002::/24 2002:a00::/24 2002:7f00::/24 2002:a9fe::/32 2002:ac10::/28 2002:c000::/40 2002:c612::/31 2002:e000::/20 } description "IPv4 (RFC 1918) & IPv6 private IP Addresses"
+tmsh create net address-list "DDoS_Bogons_v4" addresses add { 0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.2.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3 } description "IPv4 (RFC 1918) private IP Addresses"
+tmsh create net address-list "DDoS_Bogons_v6" addresses add { fc00::/7 fd00::/8 fe80::/10 ::/128 ::1/128 ::ffff:0:0/96 ::/96 2001::/40 2001:0:a00::/40 2001:0:7f00::/40 2001:0:a9fe::/48 2002::/24 2002:a00::/24 2002:7f00::/24 2002:a9fe::/32 2002:ac10::/28 2002:c000::/40 2002:c612::/31 2002:e000::/20 } description "IPv6 private IP Addresses"
+
 tmsh create net port-list    "DDoS_Common_Ports" ports add { 1 7 11 17 19 21 53 69 111 123 137 139 445 520 751 1124 1239 1434 1900 2001 3000 3702 4444 5353 6000 7777 8080 8081 9999 11211 12704 27015 28915 65535 } description "List of common ports used for DDoS Attacks, *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** https://www.adminsub.net/tcp-udp-port-finder/7777"
 sleep 2															
 #--- IPI ---
@@ -76,19 +78,6 @@ tmsh create security ip-intelligence blacklist-category "DDoS_Blacklisted" descr
 wait
 sleep 2
 echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-ip-intelligence-feed-list.html
-# >>> TMSH Location: show running-config security ip-intelligence 
-
-# Human Readable version below
-#create security ip-intelligence feed-list "DDoS_Feeds_test" description "IP addresses and URLs to allow and block DDoS sources" feeds add 
-#"blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" interval 432300 }}}
-#"blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt" interval 432000 }}}
-#"blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }}}
-#"whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }}}
-#"whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }}}
-#"whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }}
-#"tor_exit_nodes" { default-blacklist-category "	tor_proxy" default-list-type "blacklist" poll { url "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" interval 86600 }}
-#}
-
 #--- Load Profile(s) from remote source ---
 if [ -f "profiles_ipi_feeds.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
