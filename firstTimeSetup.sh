@@ -4,8 +4,8 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.17"
-Updated="1/16/19"
+Version="1.0.18"
+Updated="1/25/19"
 TestedOn="BigIP 15.0 - 15.1"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
@@ -104,5 +104,15 @@ wait
 # log-rtbh enabled -> The log-rtbh option can only be enabled on the global-network log profile.
 # log-scrubber enabled -> The log-scrubber option can only be enabled on the global-network log profile.
 
-echo "\r\n \r\n DONE! \r\n \r\n"
-echo "Please run another script to provide use-case specific examples. \r\n"
+echo "
+
+DONE!
+
+
+Please run another script to provide use-case specific examples.
+Examples include:
+   ./firstTimeSetup_ddos.sh
+   ./firstTimeSetup_adc.sh
+
+
+"

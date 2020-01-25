@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # By: Christopher Gray
-# Version: 0.0.8
+# Version: 0.0.9
 # Updated: 1/15/20
 #
 # BigIP Versions Tested on: 15.0 - 15.1
@@ -29,25 +29,26 @@
 
 echo "Provisioning BigIP... "
 
-echo "LTM "
+echo "LTM  (this will take a few minutes to complete)"
 tmsh modify sys provision ltm { level minimum }
 sleep 45
 
-echo "AFM "
+echo "AFM  (this will take a few minutes to complete)"
 tmsh modify sys provision afm { level nominal }
 sleep 45
 
-echo "DDoS  "
+echo "DDoS  (this will take a few minutes to complete)"
 tmsh modify sys provision dos { level nominal }
 sleep 45
 
-# #tmsh sys provision asm { level nominal }
-# #tmsh sys provision ilx { level minimum }
+#tmsh sys provision asm { level nominal }
+#tmsh sys provision ilx { level minimum }
 
-
-echo "AVR  "
+echo "AVR  (this will take a few minutes to complete)"
 tmsh modify sys provision avr { level minimum }
 #-- You should reboot at this point before continuing. --
+tmsh restart sys service snmpd
+tmsh stop sys service snmpd  # to stop infinite loop of restarting snmpd
 #------------------------------------
 echo "Saving config..  "
 tmsh save sys config
@@ -55,9 +56,8 @@ wait
 echo "Done!"
 echo "  "
 echo "  "
-echo "Once you log back in, run the script: 'firstTimeSetup.sh' "
+echo "Once you log back in, run the script: './F5_DDoS_BP-master/firstTimeSetup.sh' "
 echo "  "
-echo "Reminder: After resetting the config. the CLI login is:  root / default "
 echo "  "
 echo "Rebooting... "
 reboot

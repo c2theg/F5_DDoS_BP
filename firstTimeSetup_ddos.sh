@@ -1,9 +1,9 @@
 #!/bin/sh
-Version="1.0.23"
-Updated="1/23/20"
+Version="1.0.24"
+Updated="1/25/20"
 TestedOn="BigIP 15.0 - 15.1"
 
-Authors = "
+Authors="
 Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
 Sven Mueller         | Security Solution Architect - SP | AMEA | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
 "
@@ -88,7 +88,7 @@ if [ -f "profiles_ipi_feeds.conf" ]; then
 	tmsh load /sys config merge file profiles_ipi_feeds.conf
 else
 	echo "Falling back to older, embedded version"
-	tmsh create security ip-intelligence feed-list "DDoS_Feeds" description "IP addresses and URLs to allow and block DDoS sources" feeds add { "blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv4.txt" interval 432300 }} "blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://www.team-cymru.org/Services/Bogons/fullbogons-ipv6.txt" interval 432000 }} "blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }} "whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }} "whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }} "whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }} "tor_exit_nodes" { default-blacklist-category "tor_proxy" default-list-type "blacklist" poll { url "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" interval 86600 }}}
+	tmsh create security ip-intelligence feed-list "DDoS_Feeds" description "IP addresses and URLs to allow and block DDoS sources" feeds add { "blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/fullbogons-ipv4.txt" interval 432300 }} "blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/fullbogons-ipv6.txt" interval 432000 }} "blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }} "whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }} "whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }} "whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }} "tor_exit_nodes" { default-blacklist-category "tor_proxy" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/Tor_exit_nodes.txt" interval 86600 }}}
 fi
 #--- Traffic-Group ---
 #Doesnt do much currently. But will in the future. Need feedback from the field
@@ -204,7 +204,7 @@ if [ -f "profiles_ddos_device.conf" ]; then
 fi
 #--------------------------------------------------------------------------------------------
 if [ -f "profiles_ddos_generic.conf" ]; then
-	echo "Config Merge verify (profiles_ddos_generic) ..  " # https://support.f5.com/csp/article/K81271448
+	echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_ddos_generic.conf verify
 	wait
 	sleep 2
