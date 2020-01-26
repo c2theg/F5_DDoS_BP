@@ -30,6 +30,18 @@ Authors / Contributers: $Authors
 #---------- SECURITY SETTINGS ------------
 #88888888888888888888888888888888888888888
 #--- Logging ---
+#--- Load Profile(s) from remote source ---
+if [ -f "profiles_ddos_logging.conf" ]; then
+	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_ddos_logging.conf verify
+	wait
+	sleep 2
+	echo "Merging DoS Profile (profiles_ipi_feeds)...  "
+	tmsh load /sys config merge file profiles_ddos_logging.conf
+else
+	echo "Falling back to older, embedded version.. not yet"
+fi
+
 echo "Setting Firewall log-publisher to: Log_Publisher  "
 tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
 
