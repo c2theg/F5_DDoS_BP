@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.24"
+Version="1.0.25"
 Updated="1/25/20"
 TestedOn="BigIP 15.0 - 15.1"
 
@@ -191,6 +191,12 @@ if [ -f "profiles_fw_ddos.conf" ]; then
 	sleep 2
 	echo "Merging DoS Profile (profiles_fw_ddos)...  "
 	tmsh load /sys config merge file profiles_fw_ddos.conf
+
+	wait 
+	sleep 5
+
+	echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
+	tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
 fi
 
 #--- Load DoS Profile(s) ---
