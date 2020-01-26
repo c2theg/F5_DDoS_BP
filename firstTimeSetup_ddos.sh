@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.26"
+Version="1.0.27"
 Updated="1/25/20"
 TestedOn="BigIP 15.0 - 15.1"
 
@@ -55,6 +55,9 @@ tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Pub
 tmsh modify security dos device-config all threshold-sensitivity medium log-publisher "Log_Publisher"
 sleep 2
 wait
+
+echo "Creating DNS Logging Profiles.. "
+tmsh create ltm profile dns-logging DNS_Logging log-publisher Log_Publisher
 
 #-- Sven Mueller -> 1/7/20
 echo "DoS Scrubtime value - 10ns"
