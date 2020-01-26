@@ -4,7 +4,7 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.18"
+Version="1.0.19"
 Updated="1/25/19"
 TestedOn="BigIP 15.0 - 15.1"
 #
@@ -84,6 +84,14 @@ tmsh create net address-list "DNS_Google" addresses add { 8.8.8.8 8.8.4.4 2001:4
 tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
 tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
 sleep 2
+
+#--- DNS config ---
+if [ -f "profiles_dns.conf" ]; then
+	echo "Loading DNS Profile (profiles_dns.conf) config file...  "
+	tmsh load /sys config merge file profiles_dns.conf verify
+	echo "Merging config... "
+	tmsh load /sys config merge file profiles_dns.conf
+fi
 
 #--- Logging ----
 echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
