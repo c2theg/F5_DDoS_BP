@@ -4,9 +4,9 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.19"
-Updated="1/25/19"
-TestedOn="BigIP 15.0 - 15.1"
+Version="1.0.20"
+Updated="1/28/19"
+TestedOn="BigIP 15.0 - 15.1 (VE and B4450)"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo "
@@ -116,7 +116,7 @@ echo "Setting Firewall log-publisher to: Log_Publisher  "
 tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
 
 echo "Creating Security event logging (DDoS_SecEvents_Logging) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-log-profile.html
-tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" 
+tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" description "Log Profile for Security Events"
 
 # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-dos-device-config.html
 tmsh modify security dos device-config all threshold-sensitivity medium log-publisher "Log_Publisher"
@@ -138,7 +138,6 @@ if [ -f "profiles_dns.conf" ]; then
 	tmsh load /sys config merge file profiles_dns.conf
 fi
 
-
 echo "
 
 DONE!
@@ -146,8 +145,11 @@ DONE!
 
 Please run another script to provide use-case specific examples.
 Examples include:
-   ./firstTimeSetup_ddos.sh
-   ./firstTimeSetup_adc.sh
+    ./firstTimeSetup_ddos.sh
+    ./firstTimeSetup_adc.sh
+
+	to view all the instructions can be viewed here:
+	cat instructions.txt
 
 
 "

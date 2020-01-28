@@ -210,6 +210,7 @@ if [ -f "profiles_ddos_generic.conf" ]; then
 	tmsh load /sys config merge file profiles_ddos_generic.conf
 fi
 #--------------------------------------------------------------
+sleep 2
 if [ -f "profiles_ddos_dns.conf" ]; then
 	echo "Config Merge verify (profiles_ddos_dns) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_ddos_dns.conf verify
@@ -244,7 +245,7 @@ sleep 2
 #create ltm virtual "CatchAll_IPv4_TCP" { destination 0.0.0.0:any profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } profiles add { "tcp-datacenter-optimized" { context { "clientside" } } } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" } 
 tmsh create ltm virtual "EXAMPLE_IPv4_DDoS_Customer" { destination 10.1.1.80:80 profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" "IPS_Network_DDoS"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DDoS Config" } 
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_UDP" "DDoS_DNS_Host" "protocol_inspection_dns"} eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DNS DDoS Config" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_UDP" "DNS_Security" "DDoS_DNS_Host" "protocol_inspection_dns"} eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DNS DDoS Config" } 
 wait
 tmsh create ltm virtual "EXAMPLE_IPv4_App" { destination 10.1.1.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L3" "DDoS_Generic" "IPS_App_LNMP" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
 wait
