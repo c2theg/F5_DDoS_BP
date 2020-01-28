@@ -1,0 +1,36 @@
+############################################################################################
+
+                Welcome to the security "Best Practices" - Firstime setup
+
+To get the latest version of this provisioning code, please visit:
+    https://github.com/c2theg/F5_DDoS_BP
+
+
+FYI: This provisioning code only uses TMSH. 
+A newer version will feature AS3 and DO so please continue to check back from time to time
+############################################################################################
+
+Run the followiong commands to setup your BigIP for the first time
+
+1) cd to /config/F5_DDoS_BP-master
+2) run  ./firstTimeSetup_reset.sh
+    -> This will take 2-5 minutes to complete, depending on system resources
+
+3) ***  Apply a BASE POLICY!  ***
+    -> Please MAKE SURE TO RUN:  ./firstTimeSetup.sh 
+       BEFORE continuing!
+
+
+4) To Provision the BigIP with the specific features:
+    a) DDoS  ->   ./firstTimeSetup_provision_DDoS.sh
+    b) WAF   ->  ./firstTimeSetup_provision_ASM.sh
+
+5) To Configure the BigIP for each use-case, please run the following:
+    a) DDoS  ->  ./firstTimeSetup_ddos.sh
+    b) ADC (Webserving)  ->  ./firstTimeSetup_adc.sh
+
+
+6) Things to do afterwards
+    1) Configure LTM nodes "Logging_node1". You want to change the IP Address from: 10.1.13.37 to at least one of your DCD nodes
+        This can be found in: Local Traffic > Nodes
+         

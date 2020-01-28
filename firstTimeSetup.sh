@@ -85,14 +85,6 @@ tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 26
 tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
 sleep 2
 
-#--- DNS config ---
-if [ -f "profiles_dns.conf" ]; then
-	echo "Loading DNS Profile (profiles_dns.conf) config file...  "
-	tmsh load /sys config merge file profiles_dns.conf verify
-	echo "Merging config... "
-	tmsh load /sys config merge file profiles_dns.conf
-fi
-
 #--- Logging ----
 echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
 tmsh create ltm node "Logging_node1" address 10.1.13.37 connection-limit 512 monitor gateway_icmp description "Logging node"
@@ -107,10 +99,45 @@ echo "Creating Log Publisher (Log_Publisher) " # https://clouddocs.f5.com/cli/tm
 tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Dest" } description "Logging Publisher"
 wait
 
+
+#--- Load Profile(s) from remote source ---
+if [ -f "profiles_ddos_logging.conf" ]; then
+	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_ddos_logging.conf verify
+	wait
+	sleep 2
+	echo "Merging DoS Profile (profiles_ipi_feeds)...  "
+	tmsh load /sys config merge file profiles_ddos_logging.conf
+else
+	echo "Falling back to older, embedded version.. not yet"
+fi
+
+echo "Setting Firewall log-publisher to: Log_Publisher  "
+tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
+
+echo "Creating Security event logging (DDoS_SecEvents_Logging) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-log-profile.html
+tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" 
+
+# https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-dos-device-config.html
+tmsh modify security dos device-config all threshold-sensitivity medium log-publisher "Log_Publisher"
+sleep 2
+wait
+
+echo "Creating DNS Logging Profiles.. "
+tmsh create ltm profile dns-logging DNS_Logging log-publisher Log_Publisher
 # log-shun enabled -> The log-shun option can only be enabled on the global-network log profile.
 # log-geo enabled  -> The log-geo option can only be enabled on the global-network log profile.
 # log-rtbh enabled -> The log-rtbh option can only be enabled on the global-network log profile.
 # log-scrubber enabled -> The log-scrubber option can only be enabled on the global-network log profile.
+
+#--- DNS config ---
+if [ -f "profiles_dns.conf" ]; then
+	echo "Loading DNS Profile (profiles_dns.conf) config file...  "
+	tmsh load /sys config merge file profiles_dns.conf verify
+	echo "Merging config... "
+	tmsh load /sys config merge file profiles_dns.conf
+fi
+
 
 echo "
 
