@@ -200,15 +200,6 @@ if [ -f "profiles_ddos_device.conf" ]; then
 	echo "Merging DoS Profile (DDoS_DeviceLevel)...  "
 	tmsh load /sys config merge file profiles_ddos_device.conf
 fi
-#--------------------------------------------------------------------------------------------
-if [ -f "profiles_ddos_generic.conf" ]; then
-	echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_ddos_generic.conf verify
-	wait
-	sleep 2
-	echo "Merging DoS Profile (DDoS_Generic)...  "
-	tmsh load /sys config merge file profiles_ddos_generic.conf
-fi
 #--------------------------------------------------------------
 sleep 2
 if [ -f "profiles_ddos_dns.conf" ]; then
@@ -219,6 +210,17 @@ if [ -f "profiles_ddos_dns.conf" ]; then
 	echo "Merging DoS Profile (profiles_ddos_dns)...  "
 	tmsh load /sys config merge file profiles_ddos_dns.conf
 fi
+#--------------------------------------------------------------------------------------------
+sleep 2
+if [ -f "profiles_ddos_generic.conf" ]; then
+	echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
+	tmsh load /sys config merge file profiles_ddos_generic.conf verify
+	wait
+	sleep 2
+	echo "Merging DoS Profile (DDoS_Generic)...  "
+	tmsh load /sys config merge file profiles_ddos_generic.conf
+fi
+
 
 #88888888888888888888888888888888888888888888888888888
 #--- IPS files: protocol_inspection_app_ddos_ips ---
@@ -239,6 +241,10 @@ if [ -f "protocol_inspection_ddos.conf" ]; then
 fi
 
 #---- Virtal Server Pool ---
+echo "
+
+
+"
 echo "Creating Virtual Server config...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
 wait
 sleep 2

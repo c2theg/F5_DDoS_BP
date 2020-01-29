@@ -115,9 +115,12 @@ fi
 echo "Setting Firewall log-publisher to: Log_Publisher  "
 tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
 
+
 echo "Creating Security event logging (DDoS_SecEvents_Logging) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-log-profile.html
 tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" description "Log Profile for Security Events"
 
+
+echo "Setting device log-publisher to (Log_Publisher)"
 # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-dos-device-config.html
 tmsh modify security dos device-config all threshold-sensitivity medium log-publisher "Log_Publisher"
 sleep 2
