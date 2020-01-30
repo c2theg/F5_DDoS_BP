@@ -18,19 +18,27 @@ Run the followiong commands to setup your BigIP for the first time
     a) DDoS  ->   ./firstTimeSetup_provision_DDoS.sh
     b) WAF   ->  ./firstTimeSetup_provision_ASM.sh
 
-3) Apply a BASE POLICY!
-    -> Please MAKE SURE TO RUN:  ./firstTimeSetup.sh 
-       BEFORE continuing!
+    (LTM and AVR are enabled in both scripts)
+
+#---------------------------------------------------------------------------
+3) Apply the BASE POLICY!
+    Please MAKE SURE TO RUN the following BEFORE continuing!
+        ./firstTimeSetup.sh 
+
+
 
 4) To Configure the BigIP for each use-case, please run the following:
-    a) DDoS  ->  ./firstTimeSetup_ddos.sh
-    b) ADC (Webserving)  ->  ./firstTimeSetup_adc.sh
+    a) DDoS  ->                 ./firstTimeSetup_ddos.sh
+    b) ADC (Webserving)  ->     ./firstTimeSetup_adc.sh
+
+
 
 5) Things to do afterwards
     1) Configure LTM nodes "Logging_node1". You want to change the IP Address from: 10.1.13.37 to at least one of your DCD nodes
         This can be found in: Local Traffic > Nodes
     2) Fix SelfIP's (10.1.1.10 - Internet_Dirty / 10.1.1.15 - Internal_Clean)
     3) You might want to change the Timezone from UTC, although DDoS information sharing usually relys on events being in UTC. 
+
 
 
 *** OPTIONAL STEP *** 
