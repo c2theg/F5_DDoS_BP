@@ -132,10 +132,12 @@ Almost All are UDP based
 | TFTP                   | 60                             | —                            |   69     |
 | Memcached              | 10,000 to 51,000               | —                            |  11211   |
 | WS-Discovery           | 15,000                         | —                            | 139,445  |
-|                        |                                | —                            |1124, 3704|
+|                        |                                | —                            |1124, 3702|
 | Apple Remote Desktop   | 35.5                           | -                            |   3283   |
+| Windows Remote Desktop |                                |                              |          |
+|  Gateway (RD Gateway)  |                                |                              |   3391   |
 +------------------------+--------------------------------+------------------------------+----------+
- worst ports:  11211 139 445 1124 3704 123 19 17 520 
-    - 11211 123 19 139
-    - Memcache, NTP, WS-Discovery, CharGEN
+ worst ports:  11211 3702 3702 123 19 17 520 
+    - 11211 3702 123 19
+    - Memcache, WS-Discovery, NTP, CharGEN
     
