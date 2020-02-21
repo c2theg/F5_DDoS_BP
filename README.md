@@ -5,6 +5,12 @@
 curl -k -O https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/download_git_repo.sh && chmod u+x download_git_repo.sh && ./download_git_repo.sh
 ```
 
+<h3>Troubleshooting</h3>
+If you get "curl: (6) Could not resolve host: raw.githubusercontent.com", issue the following command in TMSH.  
+```
+tmsh modify sys dns name-servers add { 208.67.220.220 9.9.9.9 1.1.1.1 8.8.8.8 2620:119:35::35 2001:4860:4860::8888 }
+```
+
 From the output, you will be given the dir list of all files. These files provide use-cases which you might want to deploy your BigIP.
 
 To provide the generic foundation for the config, run:
