@@ -1,0 +1,126 @@
+# Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
+# Updated: 2/22/2020
+# Version: 1.0.7
+#
+# show running-config security log profile
+#
+# In <= 15.0, Netflow logging is not aviable
+#---------------------------------------------------------------------------------------------------------------------------------------------
+security log profile DDoS_Logging {
+    description "Logging policy for DDoS events"
+    dos-network-publisher Log_Publisher
+    flowspec {
+        log-publisher Log_Publisher
+    }
+    ip-intelligence {
+        log-publisher Log_Publisher
+    }
+    network {
+        DDoS_Logging {
+            filter {
+                log-ip-errors enabled
+                log-tcp-errors enabled
+                log-tcp-events enabled
+            }
+            format {
+                field-list { acl_policy_name acl_policy_type acl_rule_name acl_rule_uuid action bigip_hostname context_name context_type date_time dest_fqdn dest_geo dest_ip dest_port drop_reason management_ip_address protocol route_domain sa_translation_pool sa_translation_type source_fqdn source_user src_geo src_ip src_port translated_dest_ip translated_dest_port translated_ip_protocol translated_route_domain translated_src_ip translated_src_port translated_vlan vlan }
+                type field-list
+            }
+            publisher Log_Publisher
+        }
+    }
+    port-misuse {
+        log-publisher Log_Publisher
+    }
+    protocol-dns {
+        DDoS_Logging {
+            filter {
+                log-dns-drop enabled
+                log-dns-filtered-drop enabled
+                log-dns-malformed enabled
+                log-dns-malicious enabled
+                log-dns-reject enabled
+            }
+            format {
+                field-list { action attack_type context_name date_time dest_ip dest_port dns_query_name dns_query_type route_domain src_ip src_port vlan }
+                type field-list
+            }
+            publisher Log_Publisher
+        }
+    }
+    protocol-dns-dos-publisher Log_Publisher
+    protocol-inspection {
+        log-packet enabled
+        log-publisher Log_Publisher
+    }
+    protocol-sip {
+        DDoS_Logging {
+            filter {
+                log-sip-drop enabled
+                log-sip-malformed enabled
+                log-sip-request-failures enabled
+                log-sip-server-errors enabled
+            }
+            format {
+                field-list { action context_name date_time dest_ip dest_port route_domain sip_callee sip_caller sip_method_type src_ip src_port vlan }
+                type field-list
+            }
+            publisher Log_Publisher
+        }
+    }
+    protocol-sip-dos-publisher Log_Publisher
+    protocol-transfer {
+        DDoS_Logging { }
+    }
+    ssh-proxy {
+        DDoS_Logging { }
+    }
+    traffic-statistics {
+        active-flows enabled
+        log-publisher Log_Publisher
+        missed-flows enabled
+        reaped-flows enabled
+        syncookies enabled
+        syncookies-whitelist enabled
+    }
+}
+
+
+security log profile global-network {
+    built-in enabled
+    description "Security logging profile for network events"
+    dos-network-publisher Log_Publisher
+    flowspec {
+        log-publisher Log_Publisher
+    }
+    ip-intelligence {
+        log-geo enabled
+        log-publisher Log_Publisher
+        log-rtbh enabled
+        log-scrubber enabled
+        log-shun enabled
+    }
+    network {
+        global-network { }
+    }
+    port-misuse {
+        log-publisher Log_Publisher
+    }
+    protocol-dns {
+        global-dns {
+            filter {
+                log-dns-malformed enabled
+                log-dns-malicious enabled
+            }
+            format {
+                type user-defined
+                user-defined "${action}${attack_type}${context_name}${date_time}${dest_ip}${dest_port}${dns_query_name}${dns_query_type}${route_domain}${src_ip}${src_port}${vlan}"
+            }
+            publisher Log_Publisher
+        }
+    }
+    protocol-dns-dos-publisher Log_Publisher
+    protocol-inspection {
+        log-publisher Log_Publisher
+    }
+}
