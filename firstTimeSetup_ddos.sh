@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.29"
-Updated="1/29/20"
+Version="1.0.31"
+Updated="2/22/20"
 TestedOn="BigIP 15.0 - 15.1"
 
 Authors="
@@ -28,6 +28,13 @@ Authors / Contributers: $Authors
 
 
 "
+
+TestOutput=$(tmsh show /sys version | grep -i "15.0")
+echo "The BigIP version is: [ $TestOutput ]"
+if [ ! -z "$TestOutput" ]; then
+	echo "We HIGHLY recommend you upgrading to 15.1 as its features IPI catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses"
+fi
+
 #----------------------------------------------------------------------------------------------------------------
 #88888888888888888888888888888888888888888
 #---------- SECURITY SETTINGS ------------
@@ -163,20 +170,33 @@ tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDo
 
 #--- Firwall Rules ---
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
-
-if [ -f "profiles_fw_ddos.conf" ]; then
-	echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_fw_ddos.conf verify
-	wait
-	sleep 2
-	echo "Merging DoS Profile (profiles_fw_ddos)...  "
-	tmsh load /sys config merge file profiles_fw_ddos.conf
-
-	wait 
-	sleep 5
-
-	echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
-	tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
+if [ ! -z "$TestOutput" ]; then
+	if [ -f "profiles_fw_ddos_15.0.conf" ]; then
+		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_fw_ddos_15.0.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_fw_ddos)...  "
+		tmsh load /sys config merge file profiles_fw_ddos_15.0.conf
+		wait 
+		sleep 5
+		echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
+		tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
+	fi
+else
+	if [ -f "profiles_fw_ddos.conf" ]; then
+		echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
+		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_fw_ddos.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_fw_ddos)...  "
+		tmsh load /sys config merge file profiles_fw_ddos.conf
+		wait 
+		sleep 5
+		echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
+		tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
+	fi
 fi
 
 #--- Load DoS Profile(s) ---
@@ -192,6 +212,7 @@ if [ -f "profiles_fastl4.conf" ]; then
 	tmsh load /sys config merge file profiles_fastl4.conf
 fi
 #--------------------------------------------------------------
+
 if [ -f "profiles_ddos_device.conf" ]; then
 	echo "Config Merge verify (profiles_ddos_device) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file profiles_ddos_device.conf verify
@@ -200,6 +221,7 @@ if [ -f "profiles_ddos_device.conf" ]; then
 	echo "Merging DoS Profile (DDoS_DeviceLevel)...  "
 	tmsh load /sys config merge file profiles_ddos_device.conf
 fi
+
 #--------------------------------------------------------------
 sleep 2
 if [ -f "profiles_ddos_dns.conf" ]; then
@@ -212,15 +234,26 @@ if [ -f "profiles_ddos_dns.conf" ]; then
 fi
 #--------------------------------------------------------------------------------------------
 sleep 2
-if [ -f "profiles_ddos_generic.conf" ]; then
-	echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_ddos_generic.conf verify
-	wait
-	sleep 2
-	echo "Merging DoS Profile (DDoS_Generic)...  "
-	tmsh load /sys config merge file profiles_ddos_generic.conf
-fi
 
+if [ ! -z "$TestOutput" ]; then
+	if [ -f "profiles_ddos_generic_15.0.conf" ]; then
+		echo "Config Merge verify (profiles_ddos_generic_15.0) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_ddos_generic_15.0.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_ddos_generic_15.0)...  "
+		tmsh load /sys config merge file profiles_ddos_generic_15.0.conf
+	fi
+else
+	if [ -f "profiles_ddos_generic.conf" ]; then
+		echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_ddos_generic.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (DDoS_Generic)...  "
+		tmsh load /sys config merge file profiles_ddos_generic.conf
+	fi
+fi
 
 #88888888888888888888888888888888888888888888888888888
 #--- IPS files: protocol_inspection_app_ddos_ips ---

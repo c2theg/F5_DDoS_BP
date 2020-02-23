@@ -4,8 +4,8 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.20"
-Updated="1/28/19"
+Version="1.0.21"
+Updated="2/22/20"
 TestedOn="BigIP 15.0 - 15.1 (VE and B4450)"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
@@ -28,6 +28,13 @@ Updated: $Updated
 Tested On: $TestedOn
 
 "
+
+TestOutput=$(tmsh show /sys version | grep -i "15.0")
+echo "The BigIP version is: [ $TestOutput ]"
+if [ ! -z "$TestOutput" ]; then
+	echo "We HIGHLY recommend you upgrading to 15.1 as its features IPI catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses"
+fi
+
 #----------------------------------------------------------------------------------------------------------------
 tmsh modify sys software update { auto-check enabled auto-phonehome enabled frequency weekly }
 echo "Setting up logout best practices "
@@ -99,26 +106,32 @@ echo "Creating Log Publisher (Log_Publisher) " # https://clouddocs.f5.com/cli/tm
 tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Dest" } description "Logging Publisher"
 wait
 
-
 #--- Load Profile(s) from remote source ---
-if [ -f "profiles_ddos_logging.conf" ]; then
-	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_ddos_logging.conf verify
-	wait
-	sleep 2
-	echo "Merging DoS Profile (profiles_ipi_feeds)...  "
-	tmsh load /sys config merge file profiles_ddos_logging.conf
+if [ ! -z "$TestOutput" ]; then
+	if [ -f "profiles_ddos_logging_15.0.conf" ]; then
+		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_ddos_logging_15.0.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_ddos_logging_15)...  "
+		tmsh load /sys config merge file profiles_ddos_logging_15.0.conf
+	fi
 else
-	echo "Falling back to older, embedded version.. not yet"
+	if [ -f "profiles_ddos_logging.conf" ]; then
+		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_ddos_logging.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_ddos_logging)...  "
+		tmsh load /sys config merge file profiles_ddos_logging.conf
+	fi
 fi
 
 echo "Setting Firewall log-publisher to: Log_Publisher  "
 tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
 
-
 echo "Creating Security event logging (DDoS_SecEvents_Logging) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-log-profile.html
 tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" description "Log Profile for Security Events"
-
 
 echo "Setting device log-publisher to (Log_Publisher)"
 # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-dos-device-config.html
