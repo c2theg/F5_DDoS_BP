@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.31"
+Version="1.0.32"
 Updated="2/22/20"
 TestedOn="BigIP 15.0 - 15.1"
 
@@ -224,18 +224,31 @@ fi
 
 #--------------------------------------------------------------
 sleep 2
-if [ -f "profiles_ddos_dns.conf" ]; then
-	echo "Config Merge verify (profiles_ddos_dns) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_ddos_dns.conf verify
-	wait
-	sleep 2
-	echo "Merging DoS Profile (profiles_ddos_dns)...  "
-	tmsh load /sys config merge file profiles_ddos_dns.conf
+#---- should run a different version of code for older -----
+if [ ! -z "$TestOutput" ]; then  
+	if [ -f "profiles_ddos_dns_15.0.conf" ]; then
+		echo "Config Merge verify (profiles_ddos_dns_15.0) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_ddos_dns_15.0.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_ddos_dns_15.0)...  "
+		tmsh load /sys config merge file profiles_ddos_dns_15.0.conf
+	fi
+else
+	if [ -f "profiles_ddos_dns.conf" ]; then
+		echo "Config Merge verify (profiles_ddos_dns) ..  " # https://support.f5.com/csp/article/K81271448
+		tmsh load /sys config merge file profiles_ddos_dns.conf verify
+		wait
+		sleep 2
+		echo "Merging DoS Profile (profiles_ddos_dns)...  "
+		tmsh load /sys config merge file profiles_ddos_dns.conf
+	fi
 fi
 #--------------------------------------------------------------------------------------------
 sleep 2
 
-if [ ! -z "$TestOutput" ]; then
+#---- should run a different version of code for older -----
+if [ ! -z "$TestOutput" ]; then  
 	if [ -f "profiles_ddos_generic_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_generic_15.0) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file profiles_ddos_generic_15.0.conf verify
