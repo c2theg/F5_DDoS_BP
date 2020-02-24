@@ -9,4 +9,3 @@ cd F5_DDoS_BP-master/
 chmod u+x *
 ls -ltrh
 cat instructions.txt
-cd F5_DDoS_BP-master/
