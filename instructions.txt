@@ -14,7 +14,7 @@ Run the followiong commands to setup your BigIP for the first time
 
 1) cd to /config/F5_DDoS_BP-master
 
-2) To Provision the BigIP with the specific features:
+2) To Provision the Feature Flags of the BigIP with the specific features:
     a) DDoS  ->   ./firstTimeSetup_provision_DDoS.sh
     b) WAF   ->  ./firstTimeSetup_provision_ASM.sh
 
@@ -26,11 +26,9 @@ Run the followiong commands to setup your BigIP for the first time
         ./firstTimeSetup.sh 
 
 
-
 4) To Configure the BigIP for each use-case, please run the following:
     a) DDoS  ->                 ./firstTimeSetup_ddos.sh
     b) ADC (Webserving)  ->     ./firstTimeSetup_adc.sh
-
 
 
 5) Things to do afterwards
