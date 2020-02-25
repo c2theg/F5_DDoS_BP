@@ -4,7 +4,7 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.24"
+Version="1.0.25"
 Updated="2/25/20"
 TestedOn="BigIP 15.0 - 15.1 (VE and B4450) and UDF"
 #
@@ -32,24 +32,25 @@ Tested On: $TestedOn
 Version=$(tmsh show /sys version | grep -i "15.0")
 Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
 if [ ! -z "$Version_NO_WHITESPACE" ]; then
-	echo "
+	echo -e "
 
-	Unsupported version of BIG-IP DETECTED!!!
-	We HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
+	\e[41mUnsupported version of BIG-IP DETECTED!!!
+	\e[41mWe HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
 	
 
 	"
 	VersionCheck="OLD"
 else
 	#echo "The BigIP version is: [ $Version_NO_WHITESPACE ]"
-	echo "
+	echo -e "
 	
-	SUPPORTED version of BIG-IP Detected!!!
+	\e[42mSUPPORTED version of BIG-IP Detected!!!
 
 
 	"
 	VersionCheck="NEW"
 fi
+
 #--- UDF fix ---
 # in UDF, we need to move all the config files used by the merge command, to the dir: /var/local/scf/
 echo "Moving config files to: /var/local/scf/ "
