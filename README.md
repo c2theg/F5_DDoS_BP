@@ -91,6 +91,7 @@ This script sets the following DDoS specific area's:
 - HTTP Profile - Optimized for Mobile users
 - HTTP-Compression Profile - Sets numerious GZip settings, and includes all common text formats used on the web. 
 - HTTP Specific DDoS Profile
+- Example Web Application / Microservice (Performance & Security Focused)
 ```
 
 
