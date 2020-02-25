@@ -50,22 +50,21 @@ if [ -f "/var/local/scf/profiles_adc_http.conf" ]; then
 	tmsh load /sys config merge file /var/local/scf/profiles_adc_http.conf
 fi
 #--------------------------------------------------------------
-
-echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
-wait
 sleep 2
-
-tmsh create ltm virtual "EXAMPLE_WAN_WebApp1_PROD" { destination 10.1.3.51:80 ip-protocol tcp profiles add { "mobile-optimized" "http-security" "tcp-datacenter-optimized" "IPS_App_LNMP" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example WebApp -RProxy, IPS" } 
 wait
-tmsh create ltm virtual "EXAMPLE_Dev_WebApp1" { destination 10.1.4.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L3" "DDoS_Generic" "IPS_App_LNMP" "DDoS_fasthttp" "tcp-datacenter-optimized" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
-echo "
+echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
+tmsh create ltm virtual "EXAMPLE_WAN_WebApp1_PROD" { destination 10.1.3.51:80 ip-protocol tcp profiles add { "tcp-datacenter-optimized" "IPS_App_LNMP" "mobile-optimized" "http-security"  "DDoS_Generic_HTTP"  } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example WebApp -RProxy, IPS" } 
+wait
+tmsh create ltm virtual "EXAMPLE_Dev_WebApp1" { destination 10.1.4.50:80 ip-protocol tcp profiles add { "tcp-datacenter-optimized" "IPS_App_LNMP" "DDoS-fastL4_Stateful_L3"  "DDoS_fasthttp" "DDoS_Generic_HTTP" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
 
-*** NOTICE: PLEASE ENABLED HSTS in the http-security profile before going into production. To do so you need a Client-SSL Certificate configured first! ***
+echo -e "
+
+\e[43m*** NOTICE: PLEASE ENABLED HSTS in the http-security profile before going into production. To do so you need a Client-SSL Certificate configured first! ***
 
 
 "
-
 wait 
 sleep 2
 echo "Saving config..  "
 tmsh save sys config
+echo "DONE!"
