@@ -128,6 +128,7 @@ These scripts also provide examples on how it can be modified to change the usec
 
 
 Almost All are UDP based
+```
 +------------------------+--------------------------------+------------------------------+----------+
 |        Protocol        | Bandwidth Amplification Factor |      Vulnerable Command      |  Port(s) |
 +------------------------+--------------------------------+------------------------------+----------+
@@ -153,9 +154,9 @@ Almost All are UDP based
 |                        |                                | —                            |1124, 3702|
 | Apple Remote Desktop   | 35.5                           | -                            |   3283   |
 | Windows Remote Desktop |                                |                              |          |
-|  Gateway (RD Gateway)  |                                |                              |   3391   |
+|  Gateway (RD Gateway)  |  ?                             |                              |   3391   |
 +------------------------+--------------------------------+------------------------------+----------+
- worst ports:  11211 3702 3702 123 19 17 520 
-    - 11211 3702 123 19
-    - Memcache, WS-Discovery, NTP, CharGEN
-    
+```
+ Worst ports: 11211 3702 3702 123 19 17 520 
+ Top 4 Ports: 11211 3702 123 19
+            - Memcache, WS-Discovery, NTP, CharGEN
