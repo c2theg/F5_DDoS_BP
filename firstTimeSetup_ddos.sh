@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.35"
+Version="1.0.36"
 Updated="2/24/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
@@ -295,13 +295,21 @@ else
 	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
 fi
 #--- IPS config ---
-if [ -f "/var/local/scf/profiles_ips_ddos.conf" ]; then
-	echo "Loading IPS (profiles_ips_ddos.conf) config file...  "
-	tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf verify
-	echo "Merging config... "
-	tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf
+if [ "$VersionCheck" == "OLD" ]; then
+	if [ -f "/var/local/scf/profiles_ips_ddos_15.0.conf" ]; then
+		echo "Loading IPS (profiles_ips_ddos_15.0.conf) config file...  "
+		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos_15.0.conf verify
+		echo "Merging config... "
+		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos_15.0.conf
+	fi
+else
+	if [ -f "/var/local/scf/profiles_ips_ddos.conf" ]; then
+		echo "Loading IPS (profiles_ips_ddos.conf) config file...  "
+		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf verify
+		echo "Merging config... "
+		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf
+	fi
 fi
-
 #---- Virtal Server Pool ---
 echo "
 
