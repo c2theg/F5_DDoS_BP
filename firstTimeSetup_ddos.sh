@@ -1,7 +1,7 @@
 #!/bin/sh
-Version="1.0.33"
+Version="1.0.35"
 Updated="2/24/20"
-TestedOn="BigIP 15.0 - 15.1"
+TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
 Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
@@ -29,10 +29,26 @@ Authors / Contributers: $Authors
 
 "
 
-VersionCheck=$(tmsh show /sys version | grep -i "15.0")
-echo "The BigIP version is: [ $VersionCheck ]"
-if [ ! -z "$VersionCheck" ]; then
-	echo "We HIGHLY recommend you upgrading to 15.1 as its features IPI catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses"
+Version=$(tmsh show /sys version | grep -i "15.0")
+Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
+if [ ! -z "$Version_NO_WHITESPACE" ]; then
+	echo "
+
+	Unsupported version of BIG-IP DETECTED!!!
+	We HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
+	
+
+	"
+	VersionCheck="OLD"
+else
+	#echo "The BigIP version is: [ $Version_NO_WHITESPACE ]"
+	echo "
+	
+	SUPPORTED version of BIG-IP Detected!!!
+
+
+	"
+	VersionCheck="NEW"
 fi
 
 #----------------------------------------------------------------------------------------------------------------
@@ -170,7 +186,7 @@ tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDo
 
 #--- Firwall Rules ---
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
-if [ ! -z "$VersionCheck" ]; then
+if [ "$VersionCheck" == "OLD" ]; then
 	if [ -f "/var/local/scf/profiles_fw_ddos_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos_15.0.conf verify
@@ -225,7 +241,7 @@ fi
 #--------------------------------------------------------------
 sleep 2
 #---- should run a different version of code for older -----
-if [ ! -z "$VersionCheck" ]; then  
+if [ "$VersionCheck" == "OLD" ]; then 
 	if [ -f "/var/local/scf/profiles_ddos_dns_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_dns_15.0) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns_15.0.conf verify
@@ -248,7 +264,7 @@ fi
 sleep 2
 
 #---- should run a different version of code for older -----
-if [ ! -z "$TestOutput" ]; then  
+if [ "$VersionCheck" == "OLD" ]; then
 	if [ -f "/var/local/scf/profiles_ddos_generic_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_generic_15.0) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic_15.0.conf verify
