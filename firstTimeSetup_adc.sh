@@ -7,8 +7,8 @@
 #
 #
 #
-Version="0.0.1"
-Updated="1/8/19"
+Version="0.0.2"
+Updated="2/25/20"
 TestedOn="BigIP 15.0 - 15.1"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
@@ -41,3 +41,8 @@ tmsh create ltm profile tcp "tcp-datacenter-optimized" congestion-control bbr de
 echo "Creating FastHTTP Profile (DDoS_fasthttp) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-profile-tcp.html
 tmsh create ltm profile fasthttp "DDoS_fasthttp" reset-on-timeout enabled idle-timeout 180 client-close-timeout 5 server-close-timeout 2 max-header-size 32768 max-requests 10000 insert-xforwarded-for enabled
 # ERROR: cant add header:  header-insert "X-XSS-Protection \"1; mode=block\";"
+
+wait 
+sleep 2
+echo "Saving config..  "
+tmsh save sys config
