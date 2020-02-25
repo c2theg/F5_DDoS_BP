@@ -4,7 +4,7 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.22"
+Version="1.0.23"
 Updated="2/24/20"
 TestedOn="BigIP 15.0 - 15.1 (VE and B4450) and UDF"
 #
@@ -114,7 +114,7 @@ wait
 
 #--- Load Profile(s) from remote source ---
 if [ ! -z "$VersionCheck" ]; then
-	if [ -f "profiles_ddos_logging_15.0.conf" ]; then
+	if [ -f "/var/local/scf/profiles_ddos_logging_15.0.conf" ]; then
 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf verify
 		wait
@@ -123,7 +123,7 @@ if [ ! -z "$VersionCheck" ]; then
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf
 	fi
 else
-	if [ -f "profiles_ddos_logging.conf" ]; then
+	if [ -f "/var/local/scf/profiles_ddos_logging.conf" ]; then
 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf verify
 		wait
@@ -153,7 +153,7 @@ tmsh create ltm profile dns-logging DNS_Logging log-publisher Log_Publisher
 # log-scrubber enabled -> The log-scrubber option can only be enabled on the global-network log profile.
 
 #--- DNS config ---
-if [ -f "profiles_dns.conf" ]; then
+if [ -f "/var/local/scf/profiles_dns.conf" ]; then
 	echo "Loading DNS Profile (profiles_dns.conf) config file...  "
 	tmsh load /sys config merge file /var/local/scf/profiles_dns.conf verify
 	echo "Merging config... "

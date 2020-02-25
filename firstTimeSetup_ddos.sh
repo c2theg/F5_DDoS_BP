@@ -78,7 +78,7 @@ wait
 sleep 2
 echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-ip-intelligence-feed-list.html
 #--- Load Profile(s) from remote source ---
-if [ -f "profiles_ipi_feeds.conf" ]; then
+if [ -f "/var/local/scf/profiles_ipi_feeds.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file /var/local/scf/profiles_ipi_feeds.conf verify
 	wait
@@ -118,7 +118,7 @@ tmsh modify security ip-intelligence global-policy ip-intelligence-policy "DDoS_
 echo "Creating Eviction Policy (DDoS_Eviction_Policy) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-eviction-policy.html
 
 #--- Load Profile(s) from remote source ---
-if [ -f "profiles_eviction.conf" ]; then
+if [ -f "/var/local/scf/profiles_eviction.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file /var/local/scf/profiles_eviction.conf verify
 	wait
@@ -171,7 +171,7 @@ tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDo
 #--- Firwall Rules ---
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
 if [ ! -z "$VersionCheck" ]; then
-	if [ -f "profiles_fw_ddos_15.0.conf" ]; then
+	if [ -f "/var/local/scf/profiles_fw_ddos_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos_15.0.conf verify
 		wait
@@ -184,7 +184,7 @@ if [ ! -z "$VersionCheck" ]; then
 		tmsh modify security firewall global-rules enforced-policy DDoS_FW_Parent
 	fi
 else
-	if [ -f "profiles_fw_ddos.conf" ]; then
+	if [ -f "/var/local/scf/profiles_fw_ddos.conf" ]; then
 		echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
 		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos.conf verify
@@ -203,17 +203,17 @@ fi
 wait 
 sleep 2
 
-if [ -f "profiles_fastl4.conf" ]; then
-	echo "Config Merge verify (profiles_fastl4) ..  " # https://support.f5.com/csp/article/K81271448
+if [ -f "/var/local/scf/profiles_fastl4.conf" ]; then
+	echo "Config FastL4 verify (profiles_fastl4) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file /var/local/scf/profiles_fastl4.conf verify
 	wait
-	sleep 2
-	echo "Merging DoS Profile (profiles_fastl4)...  "
+	sleep 4
+	echo "Merging FastL4 Profile (profiles_fastl4)...  "
 	tmsh load /sys config merge file /var/local/scf/profiles_fastl4.conf
 fi
 #--------------------------------------------------------------
 
-if [ -f "profiles_ddos_device.conf" ]; then
+if [ -f "/var/local/scf/profiles_ddos_device.conf" ]; then
 	echo "Config Merge verify (profiles_ddos_device) ..  " # https://support.f5.com/csp/article/K81271448
 	tmsh load /sys config merge file /var/local/scf/profiles_ddos_device.conf verify
 	wait
@@ -226,7 +226,7 @@ fi
 sleep 2
 #---- should run a different version of code for older -----
 if [ ! -z "$VersionCheck" ]; then  
-	if [ -f "profiles_ddos_dns_15.0.conf" ]; then
+	if [ -f "/var/local/scf/profiles_ddos_dns_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_dns_15.0) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns_15.0.conf verify
 		wait
@@ -235,7 +235,7 @@ if [ ! -z "$VersionCheck" ]; then
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns_15.0.conf
 	fi
 else
-	if [ -f "profiles_ddos_dns.conf" ]; then
+	if [ -f "/var/local/scf/profiles_ddos_dns.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_dns) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns.conf verify
 		wait
@@ -249,7 +249,7 @@ sleep 2
 
 #---- should run a different version of code for older -----
 if [ ! -z "$TestOutput" ]; then  
-	if [ -f "profiles_ddos_generic_15.0.conf" ]; then
+	if [ -f "/var/local/scf/profiles_ddos_generic_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_generic_15.0) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic_15.0.conf verify
 		wait
@@ -258,7 +258,7 @@ if [ ! -z "$TestOutput" ]; then
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic_15.0.conf
 	fi
 else
-	if [ -f "profiles_ddos_generic.conf" ]; then
+	if [ -f "/var/local/scf/profiles_ddos_generic.conf" ]; then
 		echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic.conf verify
 		wait
@@ -279,7 +279,7 @@ else
 	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
 fi
 #--- IPS config ---
-if [ -f "profiles_ips_ddos.conf" ]; then
+if [ -f "/var/local/scf/profiles_ips_ddos.conf" ]; then
 	echo "Loading IPS (profiles_ips_ddos.conf) config file...  "
 	tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf verify
 	echo "Merging config... "
