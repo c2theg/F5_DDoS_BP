@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.37"
+Version="1.0.38"
 Updated="2/25/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
@@ -10,15 +10,44 @@ Sven Mueller         | Security Solution Architect - SP | AMEA | F5 Networks | +
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo "
 
+\e[41m
+MMMMMMMMMMMMMMMMWX0kdlc:;;;;;;;:clox0XWWMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMWX0kdlc:;;;;;;;;;;;;;;;;:lox0XWMMMMMMMMMMMMMMMMM
+MMMMMMMMMWXOdc;;;;;;,;;;;;,,;;;;;;;;;;;;;cokXWMMMMMMMMMMMMMM
+MMMMMMMWKxc;;;,;;:clodddddl:;;;;;;;,;;;;;;;;cd0NMMMMMMMMMMMM
+MMMMMWKd:;,;:ldk0KXXNWWWWWN0dc;;;:oxxxxddoollccd0NMMMMMMMMMM
+MMMWXxc;;;lxKNWMWKxoodxOKNWWXdc;;dXWMMMWWWWNNXKKKNMMMMMMMMMM
+MMW0o;,;lONWMMMMNd;,;;;;:ldxo:;;lKWMMMMMMMMMMMMMMWXKNMMMMMMM
+MWOc;;;dXWMMMMMMXo,;;,;;;;;;;;;:kWWNKKKXXXXNNWWWWNxckNMMMMMM
+W0c;;;lKWMMMMMMWKl,;;;;;;;;;;;:dXWXd::::cccllloodoc;:kNMMMMM
+Ko;,,;dNMMMMMMMWKl;;;:;:::;;;lxKWW0lc::;;;;;;;;;;;;;;c0WMMMM
+d:cdxkKWMMMMMMMMNK00000K0Ol;:kNWMMNXXXK0Okxol:;;;;;,;;dXMMMM
+c;xXNWWMMMMMMMMMWNXXXXXKOdc;dXWMMMMMMMMMMMWWNKOdc;;;;;cOWMMM
+;;coodKWMMMMMMMW0occccc:;,;lKWMMMMMMMMMMMMMMMMMWXOl;;,;xNMMM
+;,;;;cOWMMMMMMMWO:;;;;;,;;:OWMMMMMMMMMMMMMMMMMMMMWXx:;;dNMMM
+;;;;;cOWMMMMMMMWO:;;;;;;;;dXWMWMMMMMMMMMMMMMMMMMMMMNk:;dNMMM
+:;;;;cOWMMMMMMMWO:,;;;;;,;coddxxkkOKXNWMMMMMMMMMMMMMXo:xNMMM
+c;;;;:OWMMMMMMMWOc;;;;;;;;;;;,,,;;;:cloxOKNMMMMMMMMMNxcOWMMM
+x;;;;:kWMMMMMMMW0c,;;;;;;;;;;;;;;;;;;;;;;:okXWMMMMMMNxdXMMMM
+Kl;;;:kWMMMMMMMW0c,;;;;;;;;c:;;;;;;;;;;;;;;;oKWMMMMMKx0WMMMM
+W0c;;;dNMMMMMMMW0l;;;;;;;lkK0o:;;;;,;;;;;;,;;xNMMMMNOONMMMMM
+MWOc;;oXMMMMMMMWKl;;;;;;oKWMWX0d:;;;;;;;;;;;;xNMMMXO0NMMWNNW
+MMW0o:dXMMMMMMMMXo;;;;;;c0WMMMWNOl;;;;;;;;;:xXWWN0k0WMMWX000
+MMMWNXNWWMMMMMMMW0dolcc;;lKWMMMMWXkdlccclox0NNKkdxKWMMMWNKKK
+MMMMMMWKkxxkkOO0000000kl;;lxO0KKXXXXXKK000Okdlco0NMMMMMMMWWW
+MMMMMMMWKxc;;;;;;::::c:;;;;;;;:::clllllcc:;;cd0NMMMMMMMMMMMM
+MMMMMMMMMWXOdc;;,;;;,;;;;;;;;;;;;;;,;;;;;cokKWMMMMMMMMMMMMMM
+MMMMMMMMMMMMWX0kdl:;;;;;;;;;;;;;;;;;:lox0XWMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMWWX0kdlc:;;;;;;;:cldxOXNWMMMMMMMMMMMMMMMMMMMM\e[0m
 
-  ______ _____            _____  _____        _____ 
- |  ____| ____|          |  __ \|  __ \      / ____|
- | |__  | |__    ______  | |  | | |  | | ___| (___  
- |  __| |___ \  |______| | |  | | |  | |/ _ \\___ \ 
- | |     ___) |          | |__| | |__| | (_) |___) |
- |_|    |____/           |_____/|_____/ \___/_____/ 
-                                                    
-                                                                                                                                                         
+
+			  	 ___  ___      ___ 
+				|   \|   \ ___/ __|
+				| |) | |) / _ \__ \
+				|___/|___/\___/___/
+                    
+
+
 Version: $Version 
 Updated: $Updated
 Tested On: $TestedOn
@@ -34,10 +63,8 @@ Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
 if [ ! -z "$Version_NO_WHITESPACE" ]; then
 	echo -e "
 
-	\e[41m
-	\e[43m Unsupported version of BIG-IP DETECTED!!! \e[25m 
-	We HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
-	\e[0m
+	\e[41m \e[43m Unsupported version of BIG-IP DETECTED!!! \e[25m 
+	We HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses \e[0m
 
 	"
 	VersionCheck="OLD"
@@ -45,9 +72,7 @@ else
 	#echo "The BigIP version is: [ $Version_NO_WHITESPACE ]"
 	echo -e "
 	
-	\e[42m
-	SUPPORTED version of BIG-IP Detected!!!
-	\e[0m
+	\e[42mSUPPORTED version of BIG-IP Detected!!!\e[0m
 
 	"
 	VersionCheck="NEW"
