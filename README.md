@@ -89,7 +89,7 @@ This script sets the following DDoS specific area's:
 ```
 - TCP Profile - Optimized for Data Center traffic (BBR congestion-control configured)
 - HTTP Profile - Optimized for Mobile users
-- Mobile-Optimized (HTTP-Compression Profile) - Sets numerious GZip settings, and includes all common text formats used on the web. 
+- HTTP-Compression Profile - Sets numerious GZip settings, and includes all common text formats used on the web. 
 ```
 
 
