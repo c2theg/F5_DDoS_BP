@@ -34,9 +34,10 @@ Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
 if [ ! -z "$Version_NO_WHITESPACE" ]; then
 	echo -e "
 
-	\e[41mUnsupported version of BIG-IP DETECTED!!!
-	\e[41mWe HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
-	
+	\e[41m
+	\e[43m Unsupported version of BIG-IP DETECTED!!! \e[25m 
+	We HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
+	\e[0m
 
 	"
 	VersionCheck="OLD"
@@ -44,8 +45,9 @@ else
 	#echo "The BigIP version is: [ $Version_NO_WHITESPACE ]"
 	echo -e "
 	
-	\e[42mSUPPORTED version of BIG-IP Detected!!!
-
+	\e[42m
+	SUPPORTED version of BIG-IP Detected!!!
+	\e[0m
 
 	"
 	VersionCheck="NEW"

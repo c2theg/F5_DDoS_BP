@@ -5,7 +5,7 @@
 #
 #
 #
-Version="0.0.7"
+Version="0.0.8"
 Updated="2/25/20"
 TestedOn="BigIP 15.0 - 15.1"
 #
@@ -59,7 +59,9 @@ tmsh create ltm virtual "EXAMPLE_Dev_WebApp1" { destination 10.1.4.50:80 ip-prot
 
 echo -e "
 
-\e[43m*** NOTICE: PLEASE ENABLED HSTS in the http-security profile before going into production. To do so you need a Client-SSL Certificate configured first! ***
+\e[43m 
+*** \e[5m NOTICE: \e[25m PLEASE ENABLED HSTS in the http-security profile before going into production. To do so you need a Client-SSL Certificate configured first! *** 
+\e[0m
 
 
 "
