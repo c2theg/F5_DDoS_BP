@@ -1,13 +1,12 @@
 #!/bin/sh
-#
-# Authors / Contributers:
-#	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
-#	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
-#
 Version="1.0.26"
 Updated="2/25/20"
-TestedOn="BigIP 15.0 - 15.1 (VE and B4450) and UDF"
-#
+TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
+
+Authors="
+Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
+Sven Mueller         | Security Solution Architect - SP | AMEA | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
+"
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo -e "
                                                                 
@@ -47,12 +46,17 @@ echo -e "
 |__|  |_|_| |___|_|      |_| |_|_|_|_|___|  |_____|___|_| |___|  _|   
                                                               |_|     
 
+
+
 Version: $Version 
 Updated: $Updated
 Tested On: $TestedOn
 
-"
+Authors / Contributers: $Authors
 
+
+"
+#----------------------------------------------------------------------------------------------------------------
 Version=$(tmsh show /sys version | grep -i "15.0")
 Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
 if [ ! -z "$Version_NO_WHITESPACE" ]; then

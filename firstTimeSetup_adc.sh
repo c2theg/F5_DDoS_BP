@@ -1,14 +1,12 @@
 #!/bin/sh
-#
-# Authors / Contributers: 
-#	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
-#
-#
-#
 Version="0.0.12"
 Updated="2/25/20"
-TestedOn="BigIP 15.0 - 15.1"
-#
+TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
+
+Authors="
+Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
+
+"
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo -e "
                                                                 
@@ -41,16 +39,20 @@ echo -e "
 \e[41m\e[97mMMMMMMMMMMMMWX0kdl:;;;;;;;;;;;;;;;;;:lox0XWMMMMMMMMMMMMMMMMM\e[0m
 \e[41m\e[97mMMMMMMMMMMMMMMMWWX0kdlc:;;;;;;;:cldxOXNWMMMMMMMMMMMMMMMMMMMM\e[0m
 																			
-						_   ___   ___ 
-					   /_\ |   \ / __|
-					  / _ \| |) | (__ 
-					 /_/ \_\___/ \___|
-									
+
+    _   ___   ___ 
+   /_\ |   \ / __|
+  / _ \| |) | (__ 
+ /_/ \_\___/ \___|
+                  
 
 
 Version: $Version 
 Updated: $Updated
 Tested On: $TestedOn
+
+Authors / Contributers: $Authors
+
 
 "
 #----------------------------------------------------------------------------------------------------------------
