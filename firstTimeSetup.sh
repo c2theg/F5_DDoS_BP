@@ -4,9 +4,9 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.21"
-Updated="2/22/20"
-TestedOn="BigIP 15.0 - 15.1 (VE and B4450)"
+Version="1.0.22"
+Updated="2/24/20"
+TestedOn="BigIP 15.0 - 15.1 (VE and B4450) and UDF"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo "
@@ -29,12 +29,18 @@ Tested On: $TestedOn
 
 "
 
-TestOutput=$(tmsh show /sys version | grep -i "15.0")
-echo "The BigIP version is: [ $TestOutput ]"
-if [ ! -z "$TestOutput" ]; then
+VersionCheck=$(tmsh show /sys version | grep -i "15.0")
+echo "The BigIP version is: [ $VersionCheck ]"
+if [ ! -z "$VersionCheck" ]; then
 	echo "We HIGHLY recommend you upgrading to 15.1 as its features IPI catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses"
 fi
 
+#--- UDF fix ---
+# in UDF, we need to move all the config files used by the merge command, to the dir: /var/local/scf/
+echo "Moving config files to: /var/local/scf/ "
+mv profiles_*.conf /var/local/scf/
+sleep 2
+ls -ltrh /var/local/scf/
 #----------------------------------------------------------------------------------------------------------------
 tmsh modify sys software update { auto-check enabled auto-phonehome enabled frequency weekly }
 echo "Setting up logout best practices "
@@ -60,9 +66,9 @@ echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
 tmsh create net vlan "Internet_Dirty" tag 666 interfaces replace-all-with { 1.2 } mtu 1500 syn-flood-rate-limit 512 syncache-threshold 5000 hardware-syncookie enabled description "Dirty traffic from Internet or Peering connection" 
 tmsh create net vlan "Internal_Clean" tag 4094 interfaces replace-all-with { 1.1 } mtu 1500  description "Internal clean traffic"
 
-echo "Creating SelfIP's (10.1.1.10 - Internet_Dirty / 10.1.1.15 - Internal_Clean) "
-tmsh create net self 10.1.1.10/32 vlan "Internet_Dirty" allow-service default
-tmsh create net self 10.1.1.15/32 vlan "Internal_Clean" allow-service default
+echo "Creating SelfIP's (10.1.3.10 - Internet_Dirty / 10.1.4.15 - Internal_Clean) "
+tmsh create net self 10.1.3.10/32 vlan "Internet_Dirty" allow-service default
+tmsh create net self 10.1.4.15/32 vlan "Internal_Clean" allow-service default
 
 echo "Configuring RFC 1918 space to have access to SNMP "
 tmsh modify sys snmp allowed-addresses add { 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }
@@ -107,23 +113,23 @@ tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Des
 wait
 
 #--- Load Profile(s) from remote source ---
-if [ ! -z "$TestOutput" ]; then
+if [ ! -z "$VersionCheck" ]; then
 	if [ -f "profiles_ddos_logging_15.0.conf" ]; then
 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_ddos_logging_15.0.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_ddos_logging_15)...  "
-		tmsh load /sys config merge file profiles_ddos_logging_15.0.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf
 	fi
 else
 	if [ -f "profiles_ddos_logging.conf" ]; then
 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_ddos_logging.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_ddos_logging)...  "
-		tmsh load /sys config merge file profiles_ddos_logging.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf
 	fi
 fi
 
@@ -149,10 +155,17 @@ tmsh create ltm profile dns-logging DNS_Logging log-publisher Log_Publisher
 #--- DNS config ---
 if [ -f "profiles_dns.conf" ]; then
 	echo "Loading DNS Profile (profiles_dns.conf) config file...  "
-	tmsh load /sys config merge file profiles_dns.conf verify
+	tmsh load /sys config merge file /var/local/scf/profiles_dns.conf verify
 	echo "Merging config... "
-	tmsh load /sys config merge file profiles_dns.conf
+	tmsh load /sys config merge file /var/local/scf/profiles_dns.conf
 fi
+
+#------------------------------------
+wait 
+sleep 2
+echo "Saving config..  "
+tmsh save sys config
+
 
 echo "
 
@@ -164,7 +177,7 @@ Examples include:
     ./firstTimeSetup_ddos.sh
     ./firstTimeSetup_adc.sh
 
-	to view all the instructions can be viewed here:
+To view all the instructions can be viewed here:
 	cat instructions.txt
 
 

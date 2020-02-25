@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.32"
-Updated="2/22/20"
+Version="1.0.33"
+Updated="2/24/20"
 TestedOn="BigIP 15.0 - 15.1"
 
 Authors="
@@ -29,9 +29,9 @@ Authors / Contributers: $Authors
 
 "
 
-TestOutput=$(tmsh show /sys version | grep -i "15.0")
-echo "The BigIP version is: [ $TestOutput ]"
-if [ ! -z "$TestOutput" ]; then
+VersionCheck=$(tmsh show /sys version | grep -i "15.0")
+echo "The BigIP version is: [ $VersionCheck ]"
+if [ ! -z "$VersionCheck" ]; then
 	echo "We HIGHLY recommend you upgrading to 15.1 as its features IPI catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses"
 fi
 
@@ -80,11 +80,11 @@ echo "Creating IP-Inteligence feed-lists (DDoS_Feeds) " # https://clouddocs.f5.c
 #--- Load Profile(s) from remote source ---
 if [ -f "profiles_ipi_feeds.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_ipi_feeds.conf verify
+	tmsh load /sys config merge file /var/local/scf/profiles_ipi_feeds.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (profiles_ipi_feeds)...  "
-	tmsh load /sys config merge file profiles_ipi_feeds.conf
+	tmsh load /sys config merge file /var/local/scf/profiles_ipi_feeds.conf
 else
 	echo "Falling back to older, embedded version"
 	tmsh create security ip-intelligence feed-list "DDoS_Feeds" description "IP addresses and URLs to allow and block DDoS sources" feeds add { "blacklist_bogon_v4" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/fullbogons-ipv4.txt" interval 432300 }} "blacklist_bogon_v6" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/fullbogons-ipv6.txt" interval 432000 }} "blacklist_generic_ips" { default-blacklist-category "DDoS_Blacklisted" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/blacklist_generic_ips.txt" interval 86400 }} "whitelist_dns_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_dns_servers.txt" interval 86500 }} "whitelist_ntp_servers" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_ntp_servers.txt" interval 86600 }} "whitelist_update_domains" { default-blacklist-category "DDoS_Whitelisted" default-list-type "whitelist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/whitelist_update_domains.txt" interval 3600 }} "tor_exit_nodes" { default-blacklist-category "tor_proxy" default-list-type "blacklist" poll { url "https://raw.githubusercontent.com/c2theg/DDoS_lists/master/Tor_exit_nodes.txt" interval 86600 }}}
@@ -120,11 +120,11 @@ echo "Creating Eviction Policy (DDoS_Eviction_Policy) " # https://clouddocs.f5.c
 #--- Load Profile(s) from remote source ---
 if [ -f "profiles_eviction.conf" ]; then
 	echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_eviction.conf verify
+	tmsh load /sys config merge file /var/local/scf/profiles_eviction.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (profiles_eviction)...  "
-	tmsh load /sys config merge file profiles_eviction.conf
+	tmsh load /sys config merge file /var/local/scf/profiles_eviction.conf
 else
 	echo "Falling back to older, embedded version"
 	tmsh create ltm eviction-policy "DDoS_Eviction_Policy" description "Policy to drop short lived connections before they DoS the BigIP" high-water 70 low-water 60 slow-flow { enabled true threshold-bps 32 grace-period 10 throttling enabled maximum 15 } strategies { bias-idle { enabled true } bias-oldest { enabled true }}
@@ -170,14 +170,14 @@ tmsh create net service-policy "DDoS_ServicePolicy_Main" port-misuse-policy "DDo
 
 #--- Firwall Rules ---
 echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
-if [ ! -z "$TestOutput" ]; then
+if [ ! -z "$VersionCheck" ]; then
 	if [ -f "profiles_fw_ddos_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_fw_ddos_15.0.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos_15.0.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_fw_ddos)...  "
-		tmsh load /sys config merge file profiles_fw_ddos_15.0.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos_15.0.conf
 		wait 
 		sleep 5
 		echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
@@ -187,11 +187,11 @@ else
 	if [ -f "profiles_fw_ddos.conf" ]; then
 		echo "Creating Firewall DDoS policy (DDoS_FW_Parent) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-policy.html
 		echo "Config Merge verify (profiles_fw_ddos) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_fw_ddos.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_fw_ddos)...  "
-		tmsh load /sys config merge file profiles_fw_ddos.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_fw_ddos.conf
 		wait 
 		sleep 5
 		echo "Set Global Firewall policy to DDoS_FW_Parent  "  #https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-firewall-global-rules.html
@@ -205,43 +205,43 @@ sleep 2
 
 if [ -f "profiles_fastl4.conf" ]; then
 	echo "Config Merge verify (profiles_fastl4) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_fastl4.conf verify
+	tmsh load /sys config merge file /var/local/scf/profiles_fastl4.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (profiles_fastl4)...  "
-	tmsh load /sys config merge file profiles_fastl4.conf
+	tmsh load /sys config merge file /var/local/scf/profiles_fastl4.conf
 fi
 #--------------------------------------------------------------
 
 if [ -f "profiles_ddos_device.conf" ]; then
 	echo "Config Merge verify (profiles_ddos_device) ..  " # https://support.f5.com/csp/article/K81271448
-	tmsh load /sys config merge file profiles_ddos_device.conf verify
+	tmsh load /sys config merge file /var/local/scf/profiles_ddos_device.conf verify
 	wait
 	sleep 2
 	echo "Merging DoS Profile (DDoS_DeviceLevel)...  "
-	tmsh load /sys config merge file profiles_ddos_device.conf
+	tmsh load /sys config merge file /var/local/scf/profiles_ddos_device.conf
 fi
 
 #--------------------------------------------------------------
 sleep 2
 #---- should run a different version of code for older -----
-if [ ! -z "$TestOutput" ]; then  
+if [ ! -z "$VersionCheck" ]; then  
 	if [ -f "profiles_ddos_dns_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_dns_15.0) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_ddos_dns_15.0.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns_15.0.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_ddos_dns_15.0)...  "
-		tmsh load /sys config merge file profiles_ddos_dns_15.0.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns_15.0.conf
 	fi
 else
 	if [ -f "profiles_ddos_dns.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_dns) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_ddos_dns.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_ddos_dns)...  "
-		tmsh load /sys config merge file profiles_ddos_dns.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_dns.conf
 	fi
 fi
 #--------------------------------------------------------------------------------------------
@@ -251,26 +251,26 @@ sleep 2
 if [ ! -z "$TestOutput" ]; then  
 	if [ -f "profiles_ddos_generic_15.0.conf" ]; then
 		echo "Config Merge verify (profiles_ddos_generic_15.0) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_ddos_generic_15.0.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic_15.0.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (profiles_ddos_generic_15.0)...  "
-		tmsh load /sys config merge file profiles_ddos_generic_15.0.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic_15.0.conf
 	fi
 else
 	if [ -f "profiles_ddos_generic.conf" ]; then
 		echo "Config Merge verify (DDoS_Generic) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file profiles_ddos_generic.conf verify
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic.conf verify
 		wait
 		sleep 2
 		echo "Merging DoS Profile (DDoS_Generic)...  "
-		tmsh load /sys config merge file profiles_ddos_generic.conf
+		tmsh load /sys config merge file /var/local/scf/profiles_ddos_generic.conf
 	fi
 fi
 
-#88888888888888888888888888888888888888888888888888888
-#--- IPS files: protocol_inspection_app_ddos_ips ---
-#88888888888888888888888888888888888888888888888888888
+#8888888888888888888888888888888888888
+#--- IPS files: profiles_ips_ddos ---
+#8888888888888888888888888888888888888
 if [ -f "pi_updates.im" ]; then
 	#tmsh modify security protocol-inspection common-config auto-update enabled auto-update-interval weekly
 	tmsh install security protocol-inspection updates file 'pi_updates.im' # pi_updates_15.1.0-20191227.0146.im
@@ -279,25 +279,24 @@ else
 	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
 fi
 #--- IPS config ---
-if [ -f "protocol_inspection_ddos.conf" ]; then
-	echo "Loading IPS (protocol_inspection_ddos.conf) config file...  "
-	tmsh load /sys config merge file protocol_inspection_ddos.conf verify
+if [ -f "profiles_ips_ddos.conf" ]; then
+	echo "Loading IPS (profiles_ips_ddos.conf) config file...  "
+	tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf verify
 	echo "Merging config... "
-	tmsh load /sys config merge file protocol_inspection_ddos.conf
+	tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf
 fi
 
 #---- Virtal Server Pool ---
 echo "
 
 
+
 "
-echo "Creating Virtual Server config...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
+echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
 wait
 sleep 2
-#create ltm virtual "CatchAll_IPv4_TCP" { destination 0.0.0.0:any profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } profiles add { "tcp-datacenter-optimized" { context { "clientside" } } } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" } 
 tmsh create ltm virtual "EXAMPLE_IPv4_DDoS_Customer" { destination 10.1.1.80:80 profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" "IPS_Network_DDoS"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DDoS Config" } 
 wait
-#tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_UDP" "DNS_Security" "DDoS_DNS_Host" "protocol_inspection_dns"} eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example customer DNS DDoS Config" } 
 tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_UDP" "DDoS_DNS_Host" "protocol_inspection_dns"} eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer DNS DDoS Config" } 
 wait
 tmsh create ltm virtual "EXAMPLE_IPv4_App" { destination 10.1.1.50:80 ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L3" "DDoS_Generic" "IPS_App_LNMP" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App -RProxy, IPS" } 
