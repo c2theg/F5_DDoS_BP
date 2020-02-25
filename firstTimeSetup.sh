@@ -4,8 +4,8 @@
 #	Christopher MJ Gray  | Product Management Engineer (SP) | F5 Networks | 609 310 1747      | cgray@f5.com
 #	Sven Mueller         | Security Solution Architect      | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com
 #
-Version="1.0.23"
-Updated="2/24/20"
+Version="1.0.24"
+Updated="2/25/20"
 TestedOn="BigIP 15.0 - 15.1 (VE and B4450) and UDF"
 #
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
@@ -29,12 +29,27 @@ Tested On: $TestedOn
 
 "
 
-VersionCheck=$(tmsh show /sys version | grep -i "15.0")
-echo "The BigIP version is: [ $VersionCheck ]"
-if [ ! -z "$VersionCheck" ]; then
-	echo "We HIGHLY recommend you upgrading to 15.1 as its features IPI catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses"
-fi
+Version=$(tmsh show /sys version | grep -i "15.0")
+Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
+if [ ! -z "$Version_NO_WHITESPACE" ]; then
+	echo "
 
+	Unsupported version of BIG-IP DETECTED!!!
+	We HIGHLY recommend you upgrading to 15.1 as its features IP-Intelligence catagories in AFM FW rules, that allows it to whitelist valid traffic sourcing from a live list of addresses
+	
+
+	"
+	VersionCheck="OLD"
+else
+	#echo "The BigIP version is: [ $Version_NO_WHITESPACE ]"
+	echo "
+	
+	SUPPORTED version of BIG-IP Detected!!!
+
+
+	"
+	VersionCheck="NEW"
+fi
 #--- UDF fix ---
 # in UDF, we need to move all the config files used by the merge command, to the dir: /var/local/scf/
 echo "Moving config files to: /var/local/scf/ "
@@ -113,7 +128,7 @@ tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Des
 wait
 
 #--- Load Profile(s) from remote source ---
-if [ ! -z "$VersionCheck" ]; then
+if [ "$VersionCheck" == "OLD" ]; then
 	if [ -f "/var/local/scf/profiles_ddos_logging_15.0.conf" ]; then
 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf verify
