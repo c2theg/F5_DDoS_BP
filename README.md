@@ -157,6 +157,8 @@ Almost All are UDP based
 |  Gateway (RD Gateway)  |  ?                             |                              |   3391   |
 +------------------------+--------------------------------+------------------------------+----------+
 ```
- Worst ports: 11211 3702 3702 123 19 17 520 
+
+ Worst ports: 11211 3702 3702 123 19 17 520
+ 
  Top 4 Ports: 11211 3702 123 19
-            - Memcache, WS-Discovery, NTP, CharGEN
+ - Memcache, WS-Discovery, NTP, CharGEN
