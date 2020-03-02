@@ -23,7 +23,8 @@ Run the followiong commands to setup your BigIP for the first time
 #---------------------------------------------------------------------------
 3) Apply the BASE POLICY!
     Please MAKE SURE TO RUN the following BEFORE continuing!
-        ./firstTimeSetup.sh 
+        ./firstTimeSetup.sh
+        ./firstTimeSetup_LAB.sh
 
 
 4) To Configure the BigIP for each use-case, please run the following:
