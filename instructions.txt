@@ -29,6 +29,7 @@ Run the followiong commands to setup your BigIP for the first time
 4) To Configure the BigIP for each use-case, please run the following:
     a) DDoS  ->                 ./firstTimeSetup_ddos.sh
     b) ADC (Webserving)  ->     ./firstTimeSetup_adc.sh
+    c) *** LAB *** DDoS  ->     ./firstTimeSetup_LAB_ddos.sh
 
 
 5) Things to do afterwards
@@ -39,9 +40,9 @@ Run the followiong commands to setup your BigIP for the first time
 
 
 
+
 *** OPTIONAL STEP *** 
     If you have a configured BigIP and want to flush the config
     run  ./firstTimeSetup_reset.sh
     -> This will take 2-5 minutes to complete, depending on system resources
-
 
