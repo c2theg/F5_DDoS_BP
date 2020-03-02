@@ -213,14 +213,6 @@ echo "
 
 DONE!
 
-
-Please run another script to provide use-case specific examples.
-Examples include:
-    ./firstTimeSetup_ddos.sh
-    ./firstTimeSetup_adc.sh
-
-To view all the instructions can be viewed here:
-	cat instructions.txt
-
-
 "
+
+cat instructions.txt
