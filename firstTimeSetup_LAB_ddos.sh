@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.39"
-Updated="3/2/20"
+Version="1.0.40"
+Updated="3/2/2020"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -44,10 +44,10 @@ echo -e "
  |   \|   \ ___/ __|
  | |) | |) / _ \__ \
  |___/|___/\___/___/
-                    
+
+
+
 FOR LAB USE ONLY
-
-
 
 
 Version: $Version 
