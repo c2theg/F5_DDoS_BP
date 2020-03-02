@@ -105,12 +105,12 @@ echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
 #tmsh create net vlan internal tag 1235 mtu 1400 interfaces replace-all-with { 1.2 }
 #tmsh create net self 10.1.1.6/32 vlan internal allow-service default
 
-tmsh create net vlan "Internet_Dirty" tag 666 interfaces replace-all-with { 1.2 } mtu 1500 syn-flood-rate-limit 512 syncache-threshold 5000 hardware-syncookie enabled description "Dirty traffic from Internet or Peering connection" 
-tmsh create net vlan "Internal_Clean" tag 4094 interfaces replace-all-with { 1.1 } mtu 1500  description "Internal clean traffic"
+tmsh modify net vlan "external" interfaces replace-all-with { 1.1 } mtu 1500 syn-flood-rate-limit 512 syncache-threshold 5000 description "Dirty traffic from Internet or Peering connection"
+#tmsh create net vlan "Internal_Clean" tag 4094 interfaces replace-all-with { 1.1 } mtu 1500  description "Internal clean traffic"
 
-echo "Creating SelfIP's (10.1.3.10 - Internet_Dirty / 10.1.4.15 - Internal_Clean) "
-tmsh create net self 10.1.3.10/32 vlan "Internet_Dirty" allow-service default
-tmsh create net self 10.1.4.15/32 vlan "Internal_Clean" allow-service default
+#echo "Creating SelfIP's (10.1.3.10 - Internet_Dirty / 10.1.4.15 - Internal_Clean) "
+#tmsh create net self 10.1.3.10/32 vlan "Internet_Dirty" allow-service default
+#tmsh create net self 10.1.4.15/32 vlan "Internal_Clean" allow-service default
 
 echo "Configuring RFC 1918 space to have access to SNMP "
 tmsh modify sys snmp allowed-addresses add { 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }
@@ -124,9 +124,9 @@ tmsh modify sys global-settings gui-security-banner enabled
 tmsh modify sys global-settings gui-security-banner-text "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED!  You must have explicit, authorized permission to access or configure this device. Unauthorized attempts and actions to access or use this system may result in civil and/or criminal penalties.  All activities performed on this device are logged and monitored."
 tmsh modify sys global-settings console-inactivity-timeout 900 # 15 minutes
 
-echo "Modify Compatibility - Enabled PVA (Hardware)" # Sven Mueller -> 1/7/20
-tmsh modify sys compatibility-level level 2
-wait 
+#echo "Modify Compatibility - Enabled PVA (Hardware)" # Sven Mueller -> 1/7/20
+#tmsh modify sys compatibility-level level 2
+#wait 
 
 echo "Creating common port-lists " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-port-list.html
 tmsh create net port-list "Ports_Webserver" ports add { 80 443 } description "HTTP & HTTPS ports"
