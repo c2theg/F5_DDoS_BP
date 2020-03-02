@@ -318,8 +318,14 @@ fi
 #8888888888888888888888888888888888888
 if [ -f "pi_updates.im" ]; then
 	#tmsh modify security protocol-inspection common-config auto-update enabled auto-update-interval weekly
-	tmsh install security protocol-inspection updates file 'pi_updates.im' # pi_updates_15.1.0-20191227.0146.im
-	tmsh show security protocol-inspection updates
+	cp pi_updates.im /shared/protocol_inspection_updates/
+	tmsh show /security protocol-inspection update
+	tmsh install /security protocol-inspection updates file pi_updates.im 
+	sleep 5
+	tmsh show /security protocol-inspection update
+ 	tmsh load /security protocol-inspection updates pi_updates.im
+	sleep 5
+	tmsh show /security protocol-inspection update
 else
 	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
 fi

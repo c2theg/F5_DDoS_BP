@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.38"
+Version="1.0.39"
 Updated="2/25/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
