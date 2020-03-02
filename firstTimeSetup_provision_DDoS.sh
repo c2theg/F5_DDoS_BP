@@ -37,9 +37,9 @@ echo "AFM  (this will take a few minutes to complete)"
 tmsh modify sys provision afm { level nominal }
 sleep 45
 
-echo "DDoS  (this will take a few minutes to complete)"
-tmsh modify sys provision dos { level nominal }
-sleep 45
+#echo "DDoS  (this will take a few minutes to complete) THIS IS FOR DHD"
+#tmsh modify sys provision dos { level nominal }
+#sleep 45
 
 #tmsh sys provision asm { level nominal }
 #tmsh sys provision ilx { level minimum }

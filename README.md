@@ -95,6 +95,18 @@ This script sets the following DDoS specific area's:
 ```
 
 
+<h2>*** LABs *** </h2>
+
+```
+    ./firstTimeSetup_LAB_ddos.sh
+```
+
+<b>All the settings as the DDoS provisioning script, except with a lower threshold for detection. Only use this in a lab environmennt. </b>
+
+
+
+
+
 <hr />
 
 <h2>Fresh Start</h2>
