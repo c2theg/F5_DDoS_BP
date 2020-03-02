@@ -1,8 +1,8 @@
 #!/bin/sh
 #
 # By: Christopher Gray
-# Version: 0.0.9
-# Updated: 1/15/20
+# Version: 0.0.10
+# Updated: 3/2/2020
 #
 # BigIP Versions Tested on: 15.0 - 15.1
 #
@@ -17,7 +17,7 @@
 # "asm" - Application Security Manager
 # "avr" - Application Visibility and Reporting
 # "cgnat" - Carrier Grade NAT
-# "dos" - DOS
+# "dos" - DOS - (THIS IS FOR DHD)
 # "fps" - Fraud Protection Service
 # "gtm" - Global Traffic Manager
 # "ilx" - iRules Language Extension
