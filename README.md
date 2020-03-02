@@ -101,10 +101,7 @@ This script sets the following DDoS specific area's:
     ./firstTimeSetup_LAB_ddos.sh
 ```
 
-<b>All the settings as the DDoS provisioning script, except with a lower threshold for detection. Only use this in a lab environmennt. </b>
-
-
-
+<b>All the settings as the DDoS provisioning script, except with a lower thresholds for detection & mitigation. Only use this in a lab environment. </b>
 
 
 <hr />
