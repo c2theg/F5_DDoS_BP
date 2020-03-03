@@ -96,8 +96,9 @@ This script sets the following DDoS specific area's:
 
 
 <h2>*** LABs *** </h2>
-
+The following configs are meant for a Lab VE enviroment. Run these instead of the ones mentioned previously. 
 ```
+    ./firstTimeSetup_LAB.sh
     ./firstTimeSetup_LAB_ddos.sh
 ```
 
