@@ -1,10 +1,10 @@
 <h1>Quick Setup</h1>
 
-    This is the “Best Practices” DDoS config that you can deploy on a BigIP which will do about 90% of what you need, out of the box. Almost all the values should be set for you, but you will have to tweak them slightly for the specific use-case. Every environment is slightly different (some more than others). This script tries to do as much as possible for you.
+This is the “Best Practices” DDoS config that you can deploy on a BigIP which will do about 90% of what you need, out of the box. Almost all the values should be set for you, but you will have to tweak them slightly for the specific use-case. Every environment is slightly different (some more than others). This script tries to do as much as possible for you.
  
-    With that being said, this config is meant for **Out-of-Path (OOP) DDoS Scrubbing Center use-case (such as Arbor TMS), which is placed at the Perimeter Edge**.  If you are installing this on a BIG-IP that is **NOT at the edge**, you will want to go into the AFM FW rules and **disable the NTP and DNS rules**, or it will likely block all your internal DNS servers, especially if they are Internal only / private. 
+With that being said, this config is meant for **Out-of-Path (OOP) DDoS Scrubbing Center use-case (such as Arbor TMS), which is placed at the Perimeter Edge**.  If you are installing this on a BIG-IP that is **NOT at the edge**, you will want to go into the AFM FW rules and **disable the NTP and DNS rules**, or it will likely block all your internal DNS servers, especially if they are Internal only / private. 
 
-	The IPI feeds are configured to pull data from another repo I publish. I will update them monthly on average if not sooner. I plan to automate that update mechanism asap, when I have some more free time, but in the meantime, you will have the most up-to-date DDoS IP address white/blacklists available. 
+The IPI feeds are configured to pull data from another repo I publish. I will update them monthly on average if not sooner. I plan to automate that update mechanism asap, when I have some more free time, but in the meantime, you will have the most up-to-date DDoS IP address white/blacklists available. 
 
 
 <hr> 
