@@ -19,7 +19,7 @@ curl -k -O https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/download_g
 If you get "<b>curl: (6) Could not resolve host: raw.githubusercontent.com</b>", issue the following command in TMSH: 
 
 ```
-tmsh modify sys dns name-servers add { 208.67.220.220 9.9.9.9 1.1.1.1 8.8.8.8 2620:119:35::35 2001:4860:4860::8888 }
+tmsh modify sys dns name-servers add { 208.67.220.220 1.1.1.2 9.9.9.9 8.8.8.8 2620:119:35::35 2001:4860:4860::8888 }
 ```
 
 <h4>UDF</h4>
