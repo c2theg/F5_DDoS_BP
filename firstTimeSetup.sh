@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.26"
-Updated="2/25/20"
+Version="1.0.27"
+Updated="4/7/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -91,7 +91,7 @@ tmsh modify sys global-settings gui-setup disabled
 tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
 
 echo "Setting DNS Servers (Google, Cloudflare, OpenDNS - v4/v6) "
-tmsh modify sys dns name-servers add { 208.67.220.220 9.9.9.9 1.1.1.1 8.8.8.8 2620:119:35::35 2001:4860:4860::8888 }
+tmsh modify sys dns name-servers add { 208.67.220.220 1.1.1.2 9.9.9.9 8.8.8.8 2606:4700:4700::1112 2001:4860:4860::8888 }
 tmsh modify sys dns search add { xyzcorp.com }
 
 echo "Setting NTP Server (Google, Cloudflare, NIST) and Timezone UTC "
@@ -136,7 +136,7 @@ sleep 2
 
 echo "Creating common address-lists (DNS Servers) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-address-list.html
 tmsh create net address-list "DNS_Google" addresses add { 8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888 } description "Google DNS"
-tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
+tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 1.1.1.2 1.0.0.2 2606:4700:4700::1112 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
 tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
 sleep 2
 
