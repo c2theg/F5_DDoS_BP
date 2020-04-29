@@ -1,5 +1,5 @@
 #!/bin/bash
-Version="0.0.6"
+Version="0.0.7"
 Updated="4/28/20"
 TestedOn="BigIP 15.1  (VE)"
 
@@ -15,21 +15,23 @@ echo "Geolocation  (ip-geolocation.zip) "
 if [ -f "ip-geolocation.zip" ]; then
     echo "FOUND!"
 else
-    echo "ip-geolocation.zip NOT FOUND! \r\n \r\n "
+    echo "ip-geolocation.zip NOT FOUND!  "
 
-    echo "Provide the FQDN where ip-geolocation.zip can be located: \r\n "
+    echo "Provide the FQDN where ip-geolocation.zip can be located: "
     read -p 'ip-geolocation.zip: ' fqdn_geozip
     
-    echo "Provide the FQDN to download the MD5 hash for ip-geolocation.zip.md5 can be located: \r\n "
+    echo "Provide the FQDN to download the MD5 hash for ip-geolocation.zip.md5 can be located:  "
     read -p 'ip-geolocation.zip.md5: ' fqdn_geozip_md5
 
     echo "Downloading db... "
-    curl -o "ip-geolocation.zip" fqdn_geozip
+    curl -o "ip-geolocation.zip" $fqdn_geozip
     
     echo "Download md5 ... "
-    curl -o "ip-geolocation.zip.md5" fqdn_geozip_md5
+    curl -o "ip-geolocation.zip.md5" $fqdn_geozip_md5
 fi
-echo "\r\n"
+echo "
+
+"
 
 #--- GeoLocation Database ---
 # https://support.f5.com/csp/article/K11176
@@ -47,11 +49,11 @@ if [ -f "ip-geolocation.zip" ]; then
     wait
     sleep 2
 
-    echo "Moving Geolocation databases... \r\n"
+    echo "Moving Geolocation databases... "
     mv ip-geolocation.zip /shared/tmp
     mv ip-geolocation.zip.md5 /shared/tmp
 
-    echo "Updating Geolocation Database... \r\n"
+    echo "Updating Geolocation Database... "
     cd /shared/tmp
     md5sum -c ip-geolocation.zip.md5
     # if md5sum is ok...
