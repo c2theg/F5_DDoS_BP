@@ -49,6 +49,7 @@ This script sets the following:
 - Address Lists
 - Logging
 ```
+The update_geoipdb.sh allows to update the GeoIP Database (You will have to host this file on a server the BigIP can reach)
 
 <h1>Use case based Setup's</h1>
 
