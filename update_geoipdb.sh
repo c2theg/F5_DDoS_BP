@@ -1,5 +1,5 @@
 #!/bin/bash
-Version="0.0.7"
+Version="0.0.8"
 Updated="4/28/20"
 TestedOn="BigIP 15.1  (VE)"
 
@@ -32,7 +32,6 @@ fi
 echo "
 
 "
-
 #--- GeoLocation Database ---
 # https://support.f5.com/csp/article/K11176
 
@@ -41,7 +40,7 @@ echo "
 
 # FYI: Default path: /config
 if [ -f "ip-geolocation.zip" ]; then
-    echo "Backing up database... \r\n "
+    echo "Backing up database...  "
     mkdir /shared/GeoIP/
     mkdir /shared/GeoIP_backup/
 
@@ -57,7 +56,7 @@ if [ -f "ip-geolocation.zip" ]; then
     cd /shared/tmp
     md5sum -c ip-geolocation.zip.md5
     # if md5sum is ok...
-    unzip ip-geolocation.zip
+    unzip -o ip-geolocation.zip
     '''
         [root@ddos-inline:Active:Standalone] tmp # unzip ip-geolocation.zip
         Archive:  ip-geolocation.zip
@@ -87,8 +86,9 @@ if [ -f "ip-geolocation.zip" ]; then
     #name = f5 networks
 
     #--- Delete files afterwards ---
-    rm -i /shared/tmp/ip-geolocation.zip
-    rm -i /shared/tmp/ip-geolocation.zip.md5
+    rm -rf /shared/tmp/ip-geolocation.zip
+    rm -rf /shared/tmp/ip-geolocation.zip.md5
+    rm -rf /shared/tmp/geoip-data-v2-*
 else
-    echo "SKIPPING Geolocation Update!  File not found (ip-geolocation.zip) \r\n \r\n "
+    echo "SKIPPING Geolocation Update!  File not found (ip-geolocation.zip)  "
 fi
