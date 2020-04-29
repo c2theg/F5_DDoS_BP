@@ -1,5 +1,5 @@
 #!/bin/bash
-Version="0.0.8"
+Version="0.0.9"
 Updated="4/28/20"
 TestedOn="BigIP 15.1  (VE)"
 
@@ -74,7 +74,7 @@ if [ -f "ip-geolocation.zip" ]; then
     geoip_update_data -f geoip-data-v2-Region*.rpm
     geoip_update_data -f geoip-data-v2-ISP-*.rpm
     geoip_update_data -f geoip-data-v2-Org-*.rpm
-    geoip_update_data -f *.rpm
+    #geoip_update_data -f *.rpm
 
     #- to Test
     geoip_lookup -f /shared/GeoIP/v2/F5GeoIPOrg.dat 65.61.115.197
