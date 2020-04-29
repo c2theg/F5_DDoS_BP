@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.27"
-Updated="4/7/20"
+Version="1.0.28"
+Updated="4/28/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -201,15 +201,19 @@ if [ -f "/var/local/scf/profiles_dns.conf" ]; then
 	echo "Merging config... "
 	tmsh load /sys config merge file /var/local/scf/profiles_dns.conf
 fi
-
 #------------------------------------
 wait 
 sleep 2
 echo "Saving config..  "
 tmsh save sys config
 
+#--- GeoLocation ----
+curl -o "update_geoipdb.sh" "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/update_geoipdb.sh"
+chmod u+x update_geoipdb.sh
+echo "To update GeoIP Database, please download the latest copy from Downloads.F5.com and place it on a server
+which this BIGIP can access, then run:  
 
-echo "
+./update_geoipdb.sh
 
 DONE!
 
