@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.28"
-Updated="4/28/20"
+Version="1.0.29"
+Updated="6/3/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -91,12 +91,12 @@ tmsh modify sys global-settings gui-setup disabled
 tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
 
 echo "Setting DNS Servers (Google, Cloudflare, OpenDNS - v4/v6) "
-tmsh modify sys dns name-servers add { 208.67.220.220 1.1.1.2 9.9.9.9 8.8.8.8 2606:4700:4700::1112 2001:4860:4860::8888 }
+tmsh modify sys dns name-servers add { 9.9.9.9 208.67.220.220 1.1.1.2 8.8.8.8 2620:fe::9 2606:4700:4700::1112 2001:4860:4860::8888 }
 tmsh modify sys dns search add { xyzcorp.com }
 
 echo "Setting NTP Server (Google, Cloudflare, NIST) and Timezone UTC "
 # Dont Add: pool.ntp.org to the list, as Shodan has servers on it. 
-tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 }
+tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 time-d-g.nist.gov }
 tmsh modify sys ntp timezone UTC
 
 echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
