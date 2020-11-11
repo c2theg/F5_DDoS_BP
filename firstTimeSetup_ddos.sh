@@ -1,6 +1,6 @@
 #!/bin/sh
 Version="1.0.39"
-Updated="2/25/20"
+Updated="11/11/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -40,13 +40,6 @@ echo -e "
 \e[41m\e[97mMMMMMMMMMMMMMMMWWX0kdlc:;;;;;;;:cldxOXNWMMMMMMMMMMMMMMMMMMMM\e[0m
 																			
 
-  ___  ___      ___ 
- |   \|   \ ___/ __|
- | |) | |) / _ \__ \
- |___/|___/\___/___/
-                    
-
-
 Version: $Version 
 Updated: $Updated
 Tested On: $TestedOn
@@ -55,6 +48,7 @@ Authors / Contributers: $Authors
 
 
 "
+sleep 5s
 #----------------------------------------------------------------------------------------------------------------
 Version=$(tmsh show /sys version | grep -i "15.0")
 Version_NO_WHITESPACE="$(echo -e "${Version}" | tr -d '[:space:]')"
