@@ -6,12 +6,12 @@
 #
 # BigIP Versions Tested on: 15.0 - 15.1
 #
-# Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
-#---- First Time setup of BigIP ----
+# Source:
+#-----------------------------------------
 echo "Running firstTimeSetup_reset_NonDestructive.sh.... "
 wait
 
-echo "Removing all config created automation scripts... "
+echo "Removing all config created by automation scripts... "
 
 #[root@ddap-as-01p:Active:Standalone] F5_DDoS_BP-master # grep "create" * | awk '{print "tmsh delete "$3, $4, $5, $6}'
 tmsh delete ltm profile tcp "tcp-datacenter-optimized"
@@ -118,5 +118,8 @@ tmsh delete ltm pool "Pool_Log_Dest"
 tmsh delete sys log-config publisher "Log_Publisher"
 tmsh delete security log profile "DDoS_SecEvents_Logging"
 
-echo "Done removing entries... "
+echo "  "
+echo "  "
+echo "  "
+echo "Done removing entries!!!  "
 echo "  "
