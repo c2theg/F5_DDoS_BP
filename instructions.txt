@@ -42,8 +42,16 @@ Run the followiong commands to setup your BigIP for the first time
 
 
 
-*** OPTIONAL STEP *** 
+*** RESET CONFIG *** 
     If you have a configured BigIP and want to flush the config
     run  ./firstTimeSetup_reset.sh
+    
     -> This will take 2-5 minutes to complete, depending on system resources
+        
+    
+    if you want a NON DESTRUCTIVE config reset:
+    run ./firstTimeSetup_reset_NonDestructive.sh
+    
+    
+
 
