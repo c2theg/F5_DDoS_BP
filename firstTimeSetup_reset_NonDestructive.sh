@@ -28,7 +28,6 @@ tmsh delete security ip-intelligence blacklist-category "DDoS_Attack_IPs"
 tmsh delete security ip-intelligence blacklist-category "DDoS_Bogons"
 tmsh delete security ip-intelligence blacklist-category "DDoS_Whitelisted"
 tmsh delete security ip-intelligence blacklist-category "DDoS_Blacklisted"
-#tmsh delete create security ip-intelligence feed-list
 tmsh delete cm traffic-group "DDoS_Traffic_Group"
 tmsh delete ip-intelligence policy "DDoS_IPI_Feeds"
 tmsh delete security ip-intelligence policy "DDoS_IPI_Feeds"
@@ -98,7 +97,6 @@ tmsh delete net address-list "DNS_CloudFlare"
 tmsh delete net address-list "DNS_OpenDNS" 
 tmsh delete ltm node "Logging_node1" 
 tmsh delete ltm pool "Pool_Log_Dest"
-#tmsh delete sys log-config destination remote-high-speed-log
 tmsh delete sys log-config publisher "Log_Publisher"
 tmsh delete security log profile "DDoS_SecEvents_Logging"
 tmsh delete ltm profile dns-logging "DNS_Logging"
@@ -117,11 +115,8 @@ tmsh delete net address-list "DNS_CloudFlare"
 tmsh delete net address-list "DNS_OpenDNS"
 tmsh delete ltm node "Logging_node1"
 tmsh delete ltm pool "Pool_Log_Dest"
-#tmsh delete sys log-config destination remote-high-speed-log
 tmsh delete sys log-config publisher "Log_Publisher"
 tmsh delete security log profile "DDoS_SecEvents_Logging"
-#tmsh delete ltm profile dns-logging DNS_Logging
-
 
 echo "Done removing entries... "
 echo "  "
