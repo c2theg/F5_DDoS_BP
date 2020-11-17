@@ -96,7 +96,7 @@ tmsh modify sys db afm.allowtmcvirtuals value true
 echo "Creating DDoS Specific Address and Port lists.. "
 tmsh create net address-list "DDoS_Whitelist" addresses add { 8.8.8.8 208.67.222.222 1.1.1.1 } description "A list of ligitimate IP addresses  *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** You should add your mgmt subnets"
 tmsh create net address-list "DDoS_Bogons_v4" addresses add { 0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.2.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3 } description "IPv4 (RFC 1918) private IP Addresses"
-tmsh create net address-list "DDoS_Bogons_v6" addresses add { fc00::/7 fd00::/8 fe80::/10 ::/128 ::ffff:0:0/96 ::/96 2001::/40 2001:0:a00::/40 2001:0:7f00::/40 2001:0:a9fe::/48 2002::/24 2002:a00::/24 2002:7f00::/24 2002:a9fe::/32 2002:ac10::/28 2002:c000::/40 2002:c612::/31 2002:e000::/20 } description "IPv6 private IP Addresses"
+tmsh create net address-list "DDoS_Bogons_v6" addresses add { fc00::/7 fe80::/10 ::/128 ::ffff:0:0/96 ::/96 2001::/40 2001:0:a00::/40 2001:0:7f00::/40 2001:0:a9fe::/48 2002::/24 2002:a00::/24 2002:7f00::/24 2002:a9fe::/32 2002:ac10::/28 2002:c000::/40 2002:c612::/31 2002:e000::/20 } description "IPv6 private IP Addresses"
 
 tmsh create net port-list    "DDoS_Common_Ports" ports add { 1 7 11 17 19 21 53 69 111 123 137 139 445 520 751 1124 1239 1434 1900 2001 3000 3702 4444 5353 6000 7777 8080 8081 9999 11211 12704 27015 28915 65535 } description "List of common ports used for DDoS Attacks, *** THIS SHOULD BE MODIFIED FOR YOUR USE CASE *** https://www.adminsub.net/tcp-udp-port-finder/7777"
 sleep 2															
