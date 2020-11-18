@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.42"
-Updated="11/17/20"
+Version="1.0.43"
+Updated="11/18/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
