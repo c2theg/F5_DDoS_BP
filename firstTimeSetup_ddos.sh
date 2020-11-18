@@ -1,5 +1,5 @@
 #!/bin/sh
-Version="1.0.43"
+Version="1.0.44"
 Updated="11/18/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
@@ -172,7 +172,7 @@ tmsh modify ltm global-settings connection global-flow-eviction-policy "/Common/
 #--- Local Traffic > Profiles > Protocol
 echo "Creating UDP Profile (DDoS_UDP) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-profile-udp.html
 tmsh create ltm profile udp "DDoS_UDP" idle-timeout 1 proxy-mss disabled ip-ttl-mode preserve
-tmsh create ltm profile udp "DDoS_DNS" idle-timeout 5 proxy-mss disabled ip-ttl-mode preserve
+tmsh create ltm profile udp "DDoS_DNS" idle-timeout 1 proxy-mss disabled ip-ttl-mode preserve
 
 echo "Creating ipother Profile (DDoS_IPOther) "
 tmsh create ltm profile ipother "DDoS_IPOther" idle-timeout 20
