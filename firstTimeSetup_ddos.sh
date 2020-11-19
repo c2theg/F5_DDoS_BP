@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.44"
-Updated="11/18/20"
+Version="1.0.45"
+Updated="11/19/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -304,39 +304,6 @@ else
 	fi
 fi
 
-#8888888888888888888888888888888888888
-#--- IPS files: profiles_ips_ddos ---
-#8888888888888888888888888888888888888
-if [ -f "pi_updates.im" ]; then
-	#tmsh modify security protocol-inspection common-config auto-update enabled auto-update-interval weekly
-	cp pi_updates.im /shared/protocol_inspection_updates/
-	tmsh show /security protocol-inspection update
-	tmsh install /security protocol-inspection updates file pi_updates.im 
-	sleep 5
-	tmsh show /security protocol-inspection update
- 	tmsh load /security protocol-inspection updates pi_updates.im
-	sleep 5
-	tmsh show /security protocol-inspection update
-else
-	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
-fi
-#--- IPS config ---
-if [ "$VersionCheck" == "OLD" ]; then
-	if [ -f "/var/local/scf/profiles_ips_ddos_15.0.conf" ]; then
-		echo "Loading IPS (profiles_ips_ddos_15.0.conf) config file...  "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos_15.0.conf verify
-		echo "Merging config... "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos_15.0.conf
-	fi
-else
-	if [ -f "/var/local/scf/profiles_ips_ddos.conf" ]; then
-		echo "Loading IPS (profiles_ips_ddos.conf) config file...  "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf verify
-		echo "Merging config... "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf
-	fi
-fi
-sleep 2
 #---- Virtal Server Pool ---
 echo "
 
@@ -347,8 +314,6 @@ wait
 tmsh create ltm virtual "EXAMPLE_IPv4_ANY_DDoS_Customer" {destination 10.1.1.80:any ip-protocol any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy DDoS_FW_Parent flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add {​ "DDoS_SecEvents_Logging" } rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer ANY-ANY DDoS Config" }
 wait
 tmsh create ltm virtual "EXAMPLE_IPv4_HTTP_Customer" { destination 10.1.1.80:80 ip-protocol tcp profiles add { "DDoS_Generic" "IPS_Network_DDoS" "http" "tcp"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" } rate-limit-mode "destination" description "Example customer HTTP DDoS Config" } 
-wait
-tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" "protocol_inspection_dns"} eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer DNS DDoS Config" } 
 wait
 tmsh create ltm virtual "CatchAll_IPv4_DNS" { destination 0.0.0.0:53  ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all DNS Only v4 traffic" } 
 tmsh create ltm virtual "CatchAll_IPv6_DNS" { destination ::.53       ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all DNS Only v6 traffic" } 
