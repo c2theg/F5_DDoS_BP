@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.30"
-Updated="10/28/20"
+Version="1.0.31"
+Updated="11/19/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -208,8 +208,8 @@ echo "Saving config..  "
 tmsh save sys config
 
 #--- GeoLocation ----
-curl -o "update_geoipdb.sh" "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/update_geoipdb.sh"
-chmod u+x update_geoipdb.sh
+#curl -o "update_geoipdb.sh" "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/update_geoipdb.sh"
+#chmod u+x update_geoipdb.sh
 echo "To update GeoIP Database, please download the latest copy from Downloads.F5.com and place it on a server
 which this BIGIP can access, then run:  
 
