@@ -311,7 +311,7 @@ echo "
 "
 echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_ANY_DDoS_Customer" {destination 10.1.1.80:any ip-protocol any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy DDoS_FW_Parent flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add {​ "DDoS_SecEvents_Logging" } rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer ANY-ANY DDoS Config" }
+tmsh create ltm virtual "EXAMPLE_IPv4_ANY_DDoS_Customer" {destination 10.1.1.80:any ip-protocol any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add {​ "DDoS_SecEvents_Logging" } rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer ANY-ANY DDoS Config" }
 wait
 tmsh create ltm virtual "EXAMPLE_IPv4_HTTP_Customer" { destination 10.1.1.80:80 ip-protocol tcp profiles add { "DDoS_Generic" "IPS_Network_DDoS" "http" "tcp"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" } rate-limit-mode "destination" description "Example customer HTTP DDoS Config" } 
 wait
