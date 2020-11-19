@@ -1,17 +1,26 @@
 #!/bin/bash
-Version="0.0.9"
-Updated="4/28/20"
+Version="0.0.10"
+Updated="11/19/20"
 TestedOn="BigIP 15.1  (VE)"
 
 Authors="
-Christopher MJ Gray  | Product Management Engineer - SP | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
+Christopher MJ Gray  | Sr. Product Owner - SP           | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
 "
 
 echo "This script will update the 
 
 "
 
-echo "Geolocation  (ip-geolocation.zip) "
+echo 'Geolocation  (ip-geolocation.zip) 
+To download the database, use the following and re-run this script. 
+
+curl -O "ip-geolocation.zip" "https://some_server_online_where_the_ip_db_is"
+curl -O "ip-geolocation.zip.md5" "https://some_server_online_where_the_ip_db_is.md5"
+
+
+'
+#--- GeoLocation ----
+
 if [ -f "ip-geolocation.zip" ]; then
     echo "FOUND!"
 else
@@ -35,8 +44,7 @@ echo "
 #--- GeoLocation Database ---
 # https://support.f5.com/csp/article/K11176
 
-#curl -O "ip-geolocation.zip" "https://some_server_online_where_the_ip_db_is"
-#curl -O "ip-geolocation.zip.md5" "https://some_server_online_where_the_ip_db_is.md5"
+
 
 # FYI: Default path: /config
 if [ -f "ip-geolocation.zip" ]; then

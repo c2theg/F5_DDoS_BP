@@ -1,7 +1,7 @@
 #!/bin/sh
-Version="1.0.44"
-Updated="11/18/20"
-TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
+Version="1.0.45"
+Updated="11/19/20"
+TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING"
 
 Authors="
 Christopher MJ Gray  | Sr. Product Owner - SP           | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
@@ -304,39 +304,7 @@ else
 	fi
 fi
 
-#8888888888888888888888888888888888888
-#--- IPS files: profiles_ips_ddos ---
-#8888888888888888888888888888888888888
-if [ -f "pi_updates.im" ]; then
-	#tmsh modify security protocol-inspection common-config auto-update enabled auto-update-interval weekly
-	cp pi_updates.im /shared/protocol_inspection_updates/
-	tmsh show /security protocol-inspection update
-	tmsh install /security protocol-inspection updates file pi_updates.im 
-	sleep 5
-	tmsh show /security protocol-inspection update
- 	tmsh load /security protocol-inspection updates pi_updates.im
-	sleep 5
-	tmsh show /security protocol-inspection update
-else
-	echo " *** To load protocol-inspection updates file, upload the file from downloads.f5.com to the BigIP, then rename it: 'pi_updates.im'  ***  "
-fi
-#--- IPS config ---
-if [ "$VersionCheck" == "OLD" ]; then
-	if [ -f "/var/local/scf/profiles_ips_ddos_15.0.conf" ]; then
-		echo "Loading IPS (profiles_ips_ddos_15.0.conf) config file...  "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos_15.0.conf verify
-		echo "Merging config... "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos_15.0.conf
-	fi
-else
-	if [ -f "/var/local/scf/profiles_ips_ddos.conf" ]; then
-		echo "Loading IPS (profiles_ips_ddos.conf) config file...  "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf verify
-		echo "Merging config... "
-		tmsh load /sys config merge file /var/local/scf/profiles_ips_ddos.conf
-	fi
-fi
-sleep 2
+
 #---- Virtal Server Pool ---
 echo "
 
@@ -344,26 +312,26 @@ echo "
 "
 echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_ANY_DDoS_Customer" {destination 10.1.1.80:any ip-protocol any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy DDoS_FW_Parent flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add {​ "DDoS_SecEvents_Logging" } rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer ANY-ANY DDoS Config" }
+tmsh create ltm virtual "EXAMPLE_IPv4_ANY_DDoS_Customer" {destination 10.1.1.80:any ip-protocol any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy DDoS_FW_Parent flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main"  rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer ANY-ANY DDoS Config" }
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_HTTP_Customer" { destination 10.1.1.80:80 ip-protocol tcp profiles add { "DDoS_Generic" "IPS_Network_DDoS" "http" "tcp"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" } rate-limit-mode "destination" description "Example customer HTTP DDoS Config" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_HTTP_Customer" { destination 10.1.1.80:80 ip-protocol tcp profiles add { "DDoS_Generic" "IPS_Network_DDoS" "http" "tcp"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Example customer HTTP DDoS Config" } 
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" "protocol_inspection_dns"} eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer DNS DDoS Config" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer DNS DDoS Config" } 
 wait
-tmsh create ltm virtual "CatchAll_IPv4_DNS" { destination 0.0.0.0:53  ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all DNS Only v4 traffic" } 
-tmsh create ltm virtual "CatchAll_IPv6_DNS" { destination ::.53       ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all DNS Only v6 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv4_DNS" { destination 0.0.0.0:53  ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all DNS Only v4 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv6_DNS" { destination ::.53       ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all DNS Only v6 traffic" } 
 wait
-tmsh create ltm virtual "CatchAll_IPv4_TCP" { destination 0.0.0.0:any ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all TCP v4 traffic" } 
-tmsh create ltm virtual "CatchAll_IPv6_TCP" { destination ::.any      ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all TCP v6 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv4_TCP" { destination 0.0.0.0:any ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all TCP v4 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv6_TCP" { destination ::.any      ip-protocol tcp profiles add { "DDoS-fastL4_Stateful_L2"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all TCP v6 traffic" } 
 wait
-tmsh create ltm virtual "CatchAll_IPv4_UDP" { destination 0.0.0.0:any ip-protocol udp profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all UDP v4 traffic" } 
-tmsh create ltm virtual "CatchAll_IPv6_UDP" { destination ::.any      ip-protocol udp profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all UDP v6 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv4_UDP" { destination 0.0.0.0:any ip-protocol udp profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all UDP v4 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv6_UDP" { destination ::.any      ip-protocol udp profiles add { "DDoS-fastL4_Stateless_L3" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all UDP v6 traffic" } 
 wait
-tmsh create ltm virtual "CatchAll_IPv4_ALL" { destination 0.0.0.0:any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all - All Protocols v4 traffic" } 
-tmsh create ltm virtual "CatchAll_IPv6_ALL" { destination ::.any      profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Catch all - All Protocols v6 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv4_ALL" { destination 0.0.0.0:any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all - All Protocols v4 traffic" } 
+tmsh create ltm virtual "CatchAll_IPv6_ALL" { destination ::.any      profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Catch all - All Protocols v6 traffic" } 
 
 #--- Not working right now ---
-#create ltm virtual "L2-Wire_Layer2"    { l2-forward enabled profiles add { "DDoS-fastL4_Stateful_L2" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Layer2 example" } 
+#create ltm virtual "L2-Wire_Layer2"    { l2-forward enabled profiles add { "DDoS-fastL4_Stateful_L2" "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main"   rate-limit-mode "destination" description "Layer2 example" } 
 # SpanPort
 #------------------------------------
 #  ISSUES

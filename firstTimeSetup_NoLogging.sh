@@ -1,7 +1,7 @@
 #!/bin/sh
-Version="1.0.30"
-Updated="10/28/20"
-TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
+Version="1.0.32"
+Updated="11/19/20"
+TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING PROFILES"
 
 Authors="
 Christopher MJ Gray  | Sr. Product Owner - SP           | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
@@ -45,6 +45,8 @@ echo -e "
 |   __| |  _|_ -|  _|    | | | |     | -_|  |__   | -_|  _| | | . |   
 |__|  |_|_| |___|_|      |_| |_|_|_|_|___|  |_____|___|_| |___|  _|   
                                                               |_|     
+
+
 
 Version: $Version 
 Updated: $Updated
@@ -140,54 +142,54 @@ tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67
 sleep 2
 
 #--- Logging ----
-echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
-tmsh create ltm node "Logging_node1" address 10.1.13.37 connection-limit 512 monitor gateway_icmp description "Logging node"
+#echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
+#tmsh create ltm node "Logging_node1" address 10.1.13.37 connection-limit 512 monitor gateway_icmp description "Logging node"
 
-echo "Creating Log Pool (Pool_Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-pool.html 
-tmsh create ltm pool "Pool_Log_Dest" monitor gateway_icmp members add { "Logging_node1":443 } description "HSL logging pool for DDoS"
+#echo "Creating Log Pool (Pool_Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-pool.html 
+#tmsh create ltm pool "Pool_Log_Dest" monitor gateway_icmp members add { "Logging_node1":443 } description "HSL logging pool for DDoS"
 
-echo "Creating Log Destination (Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
-tmsh create sys log-config destination remote-high-speed-log "Log_Dest" pool-name "Pool_Log_Dest" protocol tcp description "HSL Destination for Logs"
+#echo "Creating Log Destination (Log_Dest) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
+#tmsh create sys log-config destination remote-high-speed-log "Log_Dest" pool-name "Pool_Log_Dest" protocol tcp description "HSL Destination for Logs"
 
-echo "Creating Log Publisher (Log_Publisher) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
-tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Dest" } description "Logging Publisher"
-wait
+#echo "Creating Log Publisher (Log_Publisher) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/sys/sys-log-config-publisher.html
+#tmsh create sys log-config publisher "Log_Publisher" destinations add { "Log_Dest" } description "Logging Publisher"
+#wait
 
 #--- Load Profile(s) from remote source ---
-if [ "$VersionCheck" == "OLD" ]; then
-	if [ -f "/var/local/scf/profiles_ddos_logging_15.0.conf" ]; then
-		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf verify
-		wait
-		sleep 2
-		echo "Merging DoS Profile (profiles_ddos_logging_15)...  "
-		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf
-	fi
-else
-	if [ -f "/var/local/scf/profiles_ddos_logging.conf" ]; then
-		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
-		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf verify
-		wait
-		sleep 2
-		echo "Merging DoS Profile (profiles_ddos_logging)...  "
-		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf
-	fi
-fi
+# if [ "$VersionCheck" == "OLD" ]; then
+# 	if [ -f "/var/local/scf/profiles_ddos_logging_15.0.conf" ]; then
+# 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+# 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf verify
+# 		wait
+# 		sleep 2
+# 		echo "Merging DoS Profile (profiles_ddos_logging_15)...  "
+# 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging_15.0.conf
+# 	fi
+# else
+# 	if [ -f "/var/local/scf/profiles_ddos_logging.conf" ]; then
+# 		echo "Config Merge verify (testing) ..  " # https://support.f5.com/csp/article/K81271448
+# 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf verify
+# 		wait
+# 		sleep 2
+# 		echo "Merging DoS Profile (profiles_ddos_logging)...  "
+# 		tmsh load /sys config merge file /var/local/scf/profiles_ddos_logging.conf
+# 	fi
+# fi
 
-echo "Setting Firewall log-publisher to: Log_Publisher  "
-tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
+# echo "Setting Firewall log-publisher to: Log_Publisher  "
+# tmsh modify security firewall config-change-log log-publisher "Log_Publisher"
 
-echo "Creating Security event logging (DDoS_SecEvents_Logging) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-log-profile.html
-tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" description "Log Profile for Security Events"
+# echo "Creating Security event logging (DDoS_SecEvents_Logging) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-log-profile.html
+# tmsh create security log profile "DDoS_SecEvents_Logging" network add { "Log_Publisher" { publisher "Log_Publisher" filter {  log-acl-match-drop enabled } rate-limit {  acl-match-drop 1024 } filter { log-tcp-errors enabled } rate-limit { tcp-errors 1024 }}} dos-network-publisher "Log_Publisher" flowspec { log-publisher "Log_Publisher" } ip-intelligence { log-publisher "Log_Publisher" aggregate-rate 1024 } port-misuse { log-publisher "Log_Publisher" aggregate-rate 1024 } protocol-dns-dos-publisher "Log_Publisher" description "Log Profile for Security Events"
 
-echo "Setting device log-publisher to (Log_Publisher)"
-# https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-dos-device-config.html
-tmsh modify security dos device-config all threshold-sensitivity medium log-publisher "Log_Publisher"
-sleep 2
-wait
+# echo "Setting device log-publisher to (Log_Publisher)"
+# # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/security/security-dos-device-config.html
+# tmsh modify security dos device-config all threshold-sensitivity medium log-publisher "Log_Publisher"
+# sleep 2
+# wait
 
-echo "Creating DNS Logging Profiles.. "
-tmsh create ltm profile dns-logging DNS_Logging log-publisher "Log_Publisher"
+# echo "Creating DNS Logging Profiles.. "
+# tmsh create ltm profile dns-logging DNS_Logging log-publisher "Log_Publisher"
 # log-shun enabled -> The log-shun option can only be enabled on the global-network log profile.
 # log-geo enabled  -> The log-geo option can only be enabled on the global-network log profile.
 # log-rtbh enabled -> The log-rtbh option can only be enabled on the global-network log profile.
@@ -207,6 +209,9 @@ echo "Saving config..  "
 tmsh save sys config
 
 #--- GeoLocation ----
+
+#curl -o "update_geoipdb.sh" "https://raw.githubusercontent.com/c2theg/F5_DDoS_BP/master/update_geoipdb.sh"
+#chmod u+x update_geoipdb.sh
 echo "To update GeoIP Database, please download the latest copy from Downloads.F5.com and place it on a server
 which this BIGIP can access, then run:  
 
