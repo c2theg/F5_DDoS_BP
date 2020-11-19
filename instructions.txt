@@ -1,6 +1,8 @@
 ############################################################################################
 
-                Welcome to the security "Best Practices" - Firstime setup
+                Welcome to the security "Best Practices" - First time setup
+                                Version: 1.0.32
+
 
 To get the latest version of this provisioning code, please visit:
     https://github.com/c2theg/F5_DDoS_BP
@@ -23,14 +25,27 @@ Run the followiong commands to setup your BigIP for the first time
 #---------------------------------------------------------------------------
 3) Apply the BASE POLICY!
     Please MAKE SURE TO RUN the following BEFORE continuing!
-        ./firstTimeSetup.sh
-        ./firstTimeSetup_LAB.sh
+
+        ./firstTimeSetup.sh               (Features Logging profiles)
+               - or - 
+        ./firstTimeSetup_NoLogging.sh     (NO LOGGING PROFILES)
+               - or - 
+        ./firstTimeSetup_LAB.sh           (Features Logging profiles, and low bandwidth)
 
 
 4) To Configure the BigIP for each use-case, please run the following:
-    a) DDoS  ->                 ./firstTimeSetup_ddos.sh
-    b) ADC (Webserving)  ->     ./firstTimeSetup_adc.sh
-    c) *** LAB *** DDoS  ->     ./firstTimeSetup_LAB_ddos.sh
+    a) DDoS  ->    
+                                ./firstTimeSetup_ddos.sh               (Logging Profiles assigned to Virtual Servers)
+                                ./firstTimeSetup_ddos_NoLogging.sh     (NO Logging Profiles on Virtual Servers)
+
+
+    b) ADC (Webserving)  ->     
+                                ./firstTimeSetup_adc.sh                (Logging Profiles assigned to Virtual Servers)
+                                ./firstTimeSetup_adc_NoLogging.sh      (NO Logging Profiles on Virtual Servers)
+
+
+    c) *** LAB *** DDoS  ->     ./firstTimeSetup_LAB_ddos.sh           (VERY log thresholds for DoS Detection)
+
 
 
 5) Things to do afterwards
@@ -38,7 +53,6 @@ Run the followiong commands to setup your BigIP for the first time
         This can be found in: Local Traffic > Nodes
     2) Fix SelfIP's (10.1.1.10 - Internet_Dirty / 10.1.1.15 - Internal_Clean)
     3) You might want to change the Timezone from UTC, although DDoS information sharing usually relys on events being in UTC. 
-
 
 
 
@@ -53,5 +67,3 @@ Run the followiong commands to setup your BigIP for the first time
     run ./firstTimeSetup_reset_NonDestructive.sh
     
     
-
-

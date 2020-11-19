@@ -53,7 +53,8 @@ Tested On: $TestedOn
 
 Authors / Contributers: $Authors
 
-Removed IPS Selection
+No logging, removed IPS profile selection
+
 
 "
 #----------------------------------------------------------------------------------------------------------------
@@ -87,11 +88,11 @@ tmsh create ltm pool "pool_WebApp1_PROD_1" monitor http members add { "node_WebA
 
 echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-virtual.html
 # "IPS_App_LNMP"
-tmsh create ltm virtual "EXAMPLE_WAN_WebApp1_PROD" { destination 10.1.3.51:80 ip-protocol tcp profiles add { "tcp-datacenter-optimized" "mobile-optimized" "http-security"  "DDoS_Generic_HTTP"  } eviction-protected enabled pool ['pool_WebApp1_PROD_1'] fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example WebApp" } 
+tmsh create ltm virtual "EXAMPLE_WAN_WebApp1_PROD" { destination 10.1.3.51:80 ip-protocol tcp profiles add { "tcp-datacenter-optimized" "mobile-optimized" "http-security"  "DDoS_Generic_HTTP"  } eviction-protected enabled pool ['pool_WebApp1_PROD_1'] fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Example WebApp" } 
 wait
 
 # "IPS_App_LNMP"
-tmsh create ltm virtual "EXAMPLE_Dev_WebApp1" { destination 10.1.4.50:80 ip-protocol tcp profiles add { "tcp-datacenter-optimized" "DDoS-fastL4_Stateful_L3"  "DDoS_Generic_HTTP" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" security-log-profiles add { "DDoS_SecEvents_Logging" }  rate-limit-mode "destination" description "Example IPv4 App" } 
+tmsh create ltm virtual "EXAMPLE_Dev_WebApp1" { destination 10.1.4.50:80 ip-protocol tcp profiles add { "tcp-datacenter-optimized" "DDoS-fastL4_Stateful_L3"  "DDoS_Generic_HTTP" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Example IPv4 App" } 
 
 echo -e "
 
