@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.45"
-Updated="11/19/20"
+Version="1.0.46"
+Updated="12/2/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING"
 
 Authors="
@@ -314,7 +314,7 @@ echo "Creating Virtual Servers...  "  # https://clouddocs.f5.com/cli/tmsh-refere
 wait
 tmsh create ltm virtual "EXAMPLE_IPv4_ANY_DDoS_Customer" {destination 10.1.1.80:any ip-protocol any profiles add { "DDoS-fastL4_Stateless_L3"  "DDoS_Generic" } eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main"  rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer ANY-ANY DDoS Config" }
 wait
-tmsh create ltm virtual "EXAMPLE_IPv4_HTTP_Customer" { destination 10.1.1.80:80 ip-protocol tcp profiles add { "DDoS_Generic" "IPS_Network_DDoS" "http" "tcp"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Example customer HTTP DDoS Config" } 
+tmsh create ltm virtual "EXAMPLE_IPv4_HTTP_Customer" { destination 10.1.1.80:80 ip-protocol tcp profiles add { "DDoS_Generic" "http" "tcp"} eviction-protected enabled fw-enforced-policy "DDoS_FW_Parent" flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" description "Example customer HTTP DDoS Config" } 
 wait
 tmsh create ltm virtual "EXAMPLE_IPv4_DNS_DDoS_Customer" { destination 10.1.1.53:53 ip-protocol udp profiles add { "DDoS_DNS" "DNS_Security" "DDoS_DNS_Host" } eviction-protected enabled flow-eviction-policy "DDoS_Eviction_Policy" ip-intelligence-policy "DDoS_IPI_Feeds" service-policy "DDoS_ServicePolicy_Main" rate-limit-mode "destination" throughput-capacity 9500 translate-address disabled translate-port disabled description "Example customer DNS DDoS Config" } 
 wait
