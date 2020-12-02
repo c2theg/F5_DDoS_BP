@@ -1,7 +1,8 @@
 ############################################################################################
 
                 Welcome to the security "Best Practices" - First time setup
-                                Version: 1.0.32
+                                Version: 1.0.33
+                                Updated: 12/2/2020
 
 
 To get the latest version of this provisioning code, please visit:
@@ -28,7 +29,7 @@ Run the followiong commands to setup your BigIP for the first time
 
         ./firstTimeSetup.sh               (Features Logging profiles)
                - or - 
-        ./firstTimeSetup_NoLogging.sh     (NO LOGGING PROFILES)
+        ./firstTimeSetup_BigIQ.sh     (NO LOGGING PROFILES)
                - or - 
         ./firstTimeSetup_LAB.sh           (Features Logging profiles, and low bandwidth)
 
@@ -36,12 +37,12 @@ Run the followiong commands to setup your BigIP for the first time
 4) To Configure the BigIP for each use-case, please run the following:
     a) DDoS  ->    
                                 ./firstTimeSetup_ddos.sh               (Logging Profiles assigned to Virtual Servers)
-                                ./firstTimeSetup_ddos_NoLogging.sh     (NO Logging Profiles on Virtual Servers)
+                                ./firstTimeSetup_ddos_BigIQ.sh     (NO Logging Profiles on Virtual Servers)
 
 
     b) ADC (Webserving)  ->     
                                 ./firstTimeSetup_adc.sh                (Logging Profiles assigned to Virtual Servers)
-                                ./firstTimeSetup_adc_NoLogging.sh      (NO Logging Profiles on Virtual Servers)
+                                ./firstTimeSetup_adc_BigIQ.sh      (NO Logging Profiles on Virtual Servers)
 
 
     c) *** LAB *** DDoS  ->     ./firstTimeSetup_LAB_ddos.sh           (VERY log thresholds for DoS Detection)
