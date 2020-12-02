@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="0.0.14"
-Updated="11/19/20"
+Version="0.0.15"
+Updated="12/2/20"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -80,7 +80,7 @@ fi
 #--------------------------------------------------------------
 wait
 echo "Creating App Node (node_WebApp1_PROD_1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
-tmsh create ltm node "node_WebApp1_PROD_1" address 10.1.13.37 connection-limit 512 monitor http description "Node for EXAMPLE_WAN_WebApp1_PROD"
+tmsh create ltm node "node_WebApp1_PROD_1" address 10.1.13.37 connection-limit 512 description "Node for EXAMPLE_WAN_WebApp1_PROD"
 
 echo "Creating App Pool (pool_WebApp1_PROD_1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-pool.html 
 tmsh create ltm pool "pool_WebApp1_PROD_1" monitor http members add { "node_WebApp1_PROD_1":80 } description "Pool with node node_WebApp1_PROD_1 in it"
