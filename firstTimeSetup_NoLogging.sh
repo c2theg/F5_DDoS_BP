@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.32"
-Updated="11/19/20"
+Version="1.0.33"
+Updated="12/2/2020"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING PROFILES"
 
 Authors="
@@ -194,6 +194,11 @@ sleep 2
 # log-geo enabled  -> The log-geo option can only be enabled on the global-network log profile.
 # log-rtbh enabled -> The log-rtbh option can only be enabled on the global-network log profile.
 # log-scrubber enabled -> The log-scrubber option can only be enabled on the global-network log profile.
+
+
+# echo "Creating BIGIQ Logging Profiles.. " Error in BIGIQ where this is missing
+tmsh create security log profile dos-remote-logging-publisher { dos-network-publisher local-db-publisher  protocol-dns-dos-publisher local-db-publisher protocol-sip-dos-publisher local-db-publisher }
+
 
 #--- DNS config ---
 if [ -f "/var/local/scf/profiles_dns.conf" ]; then
