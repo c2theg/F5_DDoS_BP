@@ -1,7 +1,7 @@
 #!/bin/sh
 Version="1.0.46"
 Updated="12/2/20"
-TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING"
+TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING - for BigIQ 7.x"
 
 Authors="
 Christopher MJ Gray  | Sr. Product Owner - SP           | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
