@@ -197,7 +197,7 @@ sleep 2
 
 
 # echo "Creating BIGIQ Logging Profiles.. " Error in BIGIQ where this is missing
-tmsh create security log profile dos-remote-logging-publisher { dos-network-publisher local-db-publisher  protocol-dns-dos-publisher local-db-publisher protocol-sip-dos-publisher local-db-publisher }
+# tmsh create security log profile dos-remote-logging-publisher { dos-network-publisher local-db-publisher  protocol-dns-dos-publisher local-db-publisher protocol-sip-dos-publisher local-db-publisher }
 
 
 #--- DNS config ---
