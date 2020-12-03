@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.33"
-Updated="12/2/2020"
+Version="1.0.34"
+Updated="12/3/2020"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING PROFILES - for BigIQ 7.x"
 
 Authors="
@@ -97,7 +97,7 @@ tmsh modify sys dns search add { xyzcorp.com }
 
 echo "Setting NTP Server (Cloudflare, Google, NIST) and Timezone UTC "
 # Dont Add: pool.ntp.org to the list, as Shodan has servers on it. 
-tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 time-d-g.nist.gov }
+tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 time-d-g.nist.gov 2610:20:6f96:96::6 }
 tmsh modify sys ntp timezone UTC
 
 echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
