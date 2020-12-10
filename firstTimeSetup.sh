@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.31"
-Updated="12/3/2020"
+Version="1.0.32"
+Updated="12/10/2020"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -88,6 +88,10 @@ echo "Setting up logout best practices "
 tmsh modify auth password-policy policy-enforcement disabled
 tmsh modify sys global-settings gui-setup disabled
 tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
+
+# --- PCCD Blobsize increase fix ---
+# modify  sys db pccd.hash.load.factor value 25
+# Dont go over 50
 
 echo "Setting DNS Servers (Quad9 - IBM Security, OpenDNS, Cloudflare, Google - v4/v6) "
 tmsh modify sys dns name-servers add { 9.9.9.9 208.67.220.220 1.1.1.2 8.8.8.8 2620:fe::9 2606:4700:4700::1112 2001:4860:4860::8888 }
