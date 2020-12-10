@@ -90,8 +90,8 @@ tmsh modify sys global-settings gui-setup disabled
 tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
 
 # --- PCCD Blobsize increase fix ---
-# modify  sys db pccd.hash.load.factor value 25
-# Dont go over 50
+# tmsh modify sys db pccd.hash.load.factor value 25
+## --- Dont go over 50 ---
 
 echo "Setting DNS Servers (Quad9 - IBM Security, OpenDNS, Cloudflare, Google - v4/v6) "
 tmsh modify sys dns name-servers add { 9.9.9.9 208.67.220.220 1.1.1.2 8.8.8.8 2620:fe::9 2606:4700:4700::1112 2001:4860:4860::8888 }
