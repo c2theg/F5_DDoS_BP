@@ -171,11 +171,12 @@ Almost All are UDP based
 | CLDAP                  | 56 to 70                       | —                            |   389    |
 | TFTP                   | 60                             | —                            |   69     |
 | Memcached              | 10,000 to 51,000               | —                            |  11211   |
-| WS-Discovery           | 15,000                         | —                            | 139,445  |
+| WS-Discovery           | 300-500                        | —                            | 139,445  |
 |                        |                                | —                            |1124, 3702|
 | Apple Remote Desktop   | 35.5                           | -                            |   3283   |
-| Windows Remote Desktop |                                |                              |          |
+| Windows Remote Desktop | 85.9                           |                              |   3389   |
 |  Gateway (RD Gateway)  |  ?                             |                              |   3391   |
+|Plex Media SSDP (PMSSDP)| 4.68                           | -                            |  32414   |
 +------------------------+--------------------------------+------------------------------+----------+
 ```
 
