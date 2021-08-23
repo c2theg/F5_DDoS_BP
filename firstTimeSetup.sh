@@ -85,7 +85,9 @@ ls -ltrh /var/local/scf/
 #----------------------------------------------------------------------------------------------------------------
 tmsh modify sys software update { auto-check enabled auto-phonehome enabled frequency weekly }
 echo "Setting up logout best practices "
-tmsh modify auth password-policy policy-enforcement disabled
+#tmsh modify auth password-policy policy-enforcement disabled
+tmsh modify auth password-policy required-lowercase 1 required-uppercase 1 required-numeric 1 required-special 1 max-login-failures 3 policy-enforcement enabled
+
 tmsh modify sys global-settings gui-setup disabled
 tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
 
@@ -94,13 +96,15 @@ tmsh modify sys httpd auth-pam-idle-timeout 21600 # 6 Hours
 ## --- Dont go over 50 ---
 
 echo "Setting DNS Servers (Quad9 - IBM Security, OpenDNS, Cloudflare, Google - v4/v6) "
-tmsh modify sys dns name-servers add { 9.9.9.9 208.67.220.220 1.1.1.2 8.8.8.8 2620:fe::9 2606:4700:4700::1112 2001:4860:4860::8888 }
+tmsh modify sys dns name-servers add { 208.67.220.123 1.1.1.3 9.9.9.9 8.8.8.8 2606:4700:4700::1113 2001:4860:4860::8888 2620:fe::9 }
 tmsh modify sys dns search add { xyzcorp.com }
+
 
 echo "Setting NTP Server (Cloudflare, Google, NIST) and Timezone UTC "
 # Dont Add: pool.ntp.org to the list, as Shodan has servers on it. 
 tmsh modify sys ntp servers add { time.cloudflare.com time.google.com time.nist.gov 162.159.200.123 216.239.35.0 time-d-g.nist.gov 2610:20:6f96:96::6 }
 tmsh modify sys ntp timezone UTC
+
 
 echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
 #tmsh create net vlan Internet_Dirty tag 1234 mtu 1400 interfaces replace-all-with { 1.1 }
@@ -108,28 +112,36 @@ echo "Creating VLANs (Internet_Dirty - 666 / Internal_Clean - 4094) "
 #tmsh create net vlan internal tag 1235 mtu 1400 interfaces replace-all-with { 1.2 }
 #tmsh create net self 10.1.1.6/32 vlan internal allow-service default
 
+
 tmsh create net vlan "Internet_Dirty" tag 666 interfaces replace-all-with { 1.2 } mtu 1500 syn-flood-rate-limit 512 syncache-threshold 5000 hardware-syncookie enabled description "Dirty traffic from Internet or Peering connection" 
 tmsh create net vlan "Internal_Clean" tag 4094 interfaces replace-all-with { 1.1 } mtu 1500  description "Internal clean traffic"
+
 
 echo "Creating SelfIP's (10.1.3.10 - Internet_Dirty / 10.1.4.15 - Internal_Clean) "
 tmsh create net self 10.1.3.10/32 vlan "Internet_Dirty" allow-service default
 tmsh create net self 10.1.4.15/32 vlan "Internal_Clean" allow-service default
 
+
 echo "Configuring RFC 1918 space to have access to SNMP "
 tmsh modify sys snmp allowed-addresses add { 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }
+tmsh modify sys snmp snmpv1 disabled
+
 
 echo "Setting 'Message of the Day' (CLI & WebUI) with Security / Legal verbage "
 tmsh modify sys sshd banner enabled
 tmsh modify sys sshd banner-text "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED!  You must have explicit, authorized permission to access or configure this device. Unauthorized attempts and actions to access or use this system may result in civil and/or criminal penalties.  All activities performed on this device are logged and monitored."
-tmsh modify sys sshd inactivity-timeout 3600 # 1 hour
+tmsh modify sys sshd inactivity-timeout 1200
 
 tmsh modify sys global-settings gui-security-banner enabled
 tmsh modify sys global-settings gui-security-banner-text "UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED!  You must have explicit, authorized permission to access or configure this device. Unauthorized attempts and actions to access or use this system may result in civil and/or criminal penalties.  All activities performed on this device are logged and monitored."
 tmsh modify sys global-settings console-inactivity-timeout 900 # 15 minutes
+tmsh modify cli global-settings idle-timeout 20
+
 
 echo "Modify Compatibility - Enabled PVA (Hardware)" # Sven Mueller -> 1/7/20
 tmsh modify sys compatibility-level level 2
 wait 
+
 
 echo "Creating common port-lists " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-port-list.html
 tmsh create net port-list "Ports_Webserver" ports add { 80 443 } description "HTTP & HTTPS ports"
@@ -137,22 +149,20 @@ tmsh create net port-list "Ports_SIP" ports add { 5060 5061 10000-10100 } descri
 tmsh create net port-list "Ports_FTP" ports add { 20 21 } description "List of FTP Ports"
 sleep 2
 
+
 echo "Creating common address-lists (DNS Servers) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-address-list.html
 tmsh create net address-list "DNS_Google" addresses add { 8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888 } description "Google DNS"
-tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 1.1.1.2 1.0.0.2 2606:4700:4700::1112 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
-tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
+tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 1.1.1.2 1.0.0.2 1.1.1.3 1.0.0.3 2606:4700:4700::1112 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
+tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.123 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
 sleep 2
 
-echo "Disable inferior/deprecated ciphers suites... "
-modify sys httpd ssl-protocol TLSv1.2
-modify sys httpd ssl-ciphersuite ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384
-modify sys httpd auth-pam-idle-timeout 1200
-modify sys httpd redirect-http-to-https enabled
-modify auth password-policy required-lowercase 1 required-uppercase 1 required-numeric 1 required-special 1 max-login-failures 3 policy-enforcement enabled
-modify sys sshd inactivity-timeout 1200
-modify cli global-settings idle-timeout 20
-modify sys ntp timezone UTC
-modify sys snmp snmpv1 disabled
+
+echo "Disable httpd inferior/deprecated ciphers suites... "
+tmsh modify sys httpd ssl-protocol TLSv1.2
+tmsh modify sys httpd ssl-ciphersuite ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384
+tmsh modify sys httpd auth-pam-idle-timeout 1200
+tmsh modify sys httpd redirect-http-to-https enabled
+sleep 2
 
 
 #--- Logging ----
