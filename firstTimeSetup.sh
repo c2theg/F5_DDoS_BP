@@ -1,6 +1,6 @@
 #!/bin/sh
-Version="1.0.32"
-Updated="12/10/2020"
+Version="1.0.33"
+Updated="8/23/2021"
 TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF)"
 
 Authors="
@@ -142,6 +142,18 @@ tmsh create net address-list "DNS_Google" addresses add { 8.8.8.8 8.8.4.4 2001:4
 tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 1.1.1.2 1.0.0.2 2606:4700:4700::1112 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
 tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
 sleep 2
+
+echo "Disable inferior/deprecated ciphers suites... "
+modify sys httpd ssl-protocol TLSv1.2
+modify sys httpd ssl-ciphersuite ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384
+modify sys httpd auth-pam-idle-timeout 1200
+modify sys httpd redirect-http-to-https enabled
+modify auth password-policy required-lowercase 1 required-uppercase 1 required-numeric 1 required-special 1 max-login-failures 3 policy-enforcement enabled
+modify sys sshd inactivity-timeout 1200
+modify cli global-settings idle-timeout 20
+modify sys ntp timezone UTC
+modify sys snmp snmpv1 disabled
+
 
 #--- Logging ----
 echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
