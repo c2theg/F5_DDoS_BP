@@ -1,11 +1,11 @@
 #!/bin/sh
-Version="1.0.46"
-Updated="12/2/20"
-TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING - for BigIQ 7.x"
+Version="1.0.47"
+Updated="3/9/2022"
+TestedOn="BigIP 15.0 - 16.1+  (VE, i15800, B4450, UDF) - NO LOGGING - for BigIQ 7.x - 8.x+"
 
 Authors="
-Christopher MJ Gray  | Sr. Product Owner - SP           | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
-Sven Mueller         | Security Solution Architect - SP | AMEA | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
+Christopher MJ Gray  | Sr. Product Manager - Service Provider  | NA   | F5 Networks | 609 310 1747 | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
+Sven Mueller         | Sr. Security Solution Architect - SP    | AMEA | F5 Networks | +49 162 290 41 06   | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
 "
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo -e "
