@@ -1,11 +1,11 @@
 #!/bin/sh
-Version="1.0.34"
-Updated="12/3/2020"
-TestedOn="BigIP 15.0 - 15.1  (VE, B4450, UDF) - NO LOGGING PROFILES - for BigIQ 7.x"
+Version="1.0.35"
+Updated="3/9/2022"
+TestedOn="BigIP 15.0 - 16.1+  (VE, i15800, B4450, UDF) - NO LOGGING PROFILES - for BigIQ 7.x - 8.x+"
 
 Authors="
-Christopher MJ Gray  | Sr. Product Owner - SP           | NA   | F5 Networks | 609 310 1747      | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
-Sven Mueller         | Security Solution Architect - SP | AMEA | F5 Networks | +49 162 290 41 06 | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
+Christopher MJ Gray  | Sr. Product Manager - Service Provider  | NA   | F5 Networks | 609 310 1747       | cgray@f5.com     | https://github.com/c2theg/F5_DDoS_BP
+Sven Mueller         | Sr. Security Solution Architect - SP    | AMEA | F5 Networks | +49 162 290 41 06  | s.mueller@f5.com | https://github.com/sv3n-mu3ll3r/F5_BIG-IP_v15.1_DDoS-configs
 "
 # Source: https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/
 echo -e "
@@ -137,9 +137,12 @@ sleep 2
 
 echo "Creating common address-lists (DNS Servers) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/net/net-address-list.html
 tmsh create net address-list "DNS_Google" addresses add { 8.8.8.8 8.8.4.4 2001:4860:4860::8844 2001:4860:4860::8888 } description "Google DNS"
-tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 1.1.1.2 1.0.0.2 2606:4700:4700::1112 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
-tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
+tmsh create net address-list "DNS_CloudFlare" addresses add { 1.1.1.1 1.0.0.1 1.1.1.2 1.0.0.2 1.1.1.3 1.0.0.3 2606:4700:4700::1112 2606:4700:4700::1111 2606:4700:4700::1001 } description "https://developers.cloudflare.com/1.1.1.1/setting-up-1.1.1.1/"
+tmsh create net address-list "DNS_OpenDNS" addresses add { 208.67.222.222 208.67.220.220 208.67.220.123 2620:119:35::35 2620:119:53::53 } description "Cisco OpenDNS"
 sleep 2
+
+echo "Configure TurboFlex to Security"
+tmsh modify turboflex profile-config type turboflex-security-v1
 
 #--- Logging ----
 #echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
