@@ -143,6 +143,7 @@ sleep 2
 
 echo "Configure TurboFlex to Security"
 tmsh modify turboflex profile-config type turboflex-security-v1
+sleep 10
 
 #--- Logging ----
 #echo "Creating Log Node (Logging_node1) " # https://clouddocs.f5.com/cli/tmsh-reference/latest/modules/ltm/ltm-node.html
