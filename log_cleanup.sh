@@ -5,7 +5,7 @@
 # Automate: Use a cronjob to schedule this to run automatically.
 #
 # Example Cron:  (every Sunday at 2:15am) 
-#    15 2 * * 7  /root/log_cleanup.sh
+#    15 2 * * 7  /config/log_cleanup.sh
 #---------------------------------------------------------------------
 
 cd /var/log
